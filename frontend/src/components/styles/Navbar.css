@@ -1,0 +1,32 @@
+.nav-wrapper {
+    background-color: #c57aed; /* Цвет фона навбара */
+    padding: 0 20px; /* Отступы слева и справа */
+  }
+  
+  .brand-logo {
+    height: 64px; /* Высота логотипа */
+    line-height: 64px; /* Выравнивание логотипа по вертикали */
+    font-size: 1.5rem; /* Размер текста логотипа */
+  }
+  
+  #nav-mobile {
+    text-align: center; /* Выравнивание элементов по центру */
+  }
+  
+  #nav-mobile li {
+    display: inline-block; /* Элементы списка в одной строке */
+    margin: 0 10px; /* Отступы между элементами */
+  }
+  
+  .right li {
+    font-size: 1.2rem; /* Размер текста для кнопок справа */
+  }
+  
+  .right li a {
+    color: #333333; /* Цвет текста для кнопок справа */
+  }
+  
+  .right li a:hover {
+    color: #ffffff; /* Цвет текста при наведении */
+  }
+  
