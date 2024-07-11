@@ -16,8 +16,7 @@ app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 origins = [
-    "http://localhost:3000",  # Adjust the port if your frontend runs on a different one
-    "https://yourfrontenddomain.com",
+    "*"
 ]
 
 app.add_middleware(
