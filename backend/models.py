@@ -6,7 +6,6 @@ class User(Base):
     __tablename__ = "user"
 
     user_id = Column(Integer, primary_key=True, index=True)
-    username = Column(String)
     hashed_password = Column(String)
     email = Column(String)
     createdat = Column(TIMESTAMP)
@@ -26,11 +25,11 @@ class UserMetadata(Base):
     user_surname = Column(String)
     user_patronymic = Column(String)
     user_email = Column(String, unique=True)
-    country_id = Column(Integer, ForeignKey("country.country_id"))  # исправлено
-    region_id = Column(Integer, ForeignKey("region.region_id"))
-    city_id = Column(Integer, ForeignKey("city.city_id"))  # исправлено
+    country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
+    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
+    city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
     role_id = Column(Integer)
-    user_id = Column(Integer, ForeignKey("user.user_id"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
 
     user = relationship("User", back_populates="user_metadata")
     country = relationship("Country", back_populates="users")
@@ -72,9 +71,9 @@ class VolunteerOrg(Base):
     vol_id = Column(Integer, primary_key=True, unique=True)
     vol_name = Column(String)
     vol_description = Column(String)
-    country_id = Column(Integer, ForeignKey("country.country_id"))  # исправлено
-    region_id = Column(Integer, ForeignKey("region.region_id"))
-    city_id = Column(Integer, ForeignKey("city.city_id"))  # исправлено
+    country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
+    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
+    city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
     vol_foundation_date = Column(Date)
     vol_contact_person = Column(Integer)
     vol_phone = Column(Integer)
@@ -96,15 +95,15 @@ class Event(Base):
     full_description = Column(String)
     start_date = Column(Date)
     end_date = Column(Date)
-    country_id = Column(Integer, ForeignKey("country.country_id"))  # исправлено
-    region_id = Column(Integer, ForeignKey("region.region_id"))
-    city_id = Column(Integer, ForeignKey("city.city_id"))  # исправлено
-    category_id = Column(Integer, ForeignKey("category.category_id"))
+    country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
+    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
+    city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
+    category_id = Column(Integer, ForeignKey("category.category_id", onupdate="CASCADE", ondelete="SET NULL"))
     required_volunteers = Column(Integer)
     registered_volunteers = Column(Integer)
     participation_points = Column(Integer)
     rewards = Column(Integer)
-    user_id = Column(Integer, ForeignKey("user.user_id"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
     creation_date = Column(Date)
     event_status = Column(Boolean)
 
@@ -126,8 +125,8 @@ class EventRegistration(Base):
     __tablename__ = "event_registration"
 
     registration_id = Column(Integer, primary_key=True, unique=True)
-    user_id = Column(Integer, ForeignKey("user.user_id"))
-    event_id = Column(Integer, ForeignKey("event.event_id"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
+    event_id = Column(Integer, ForeignKey("event.event_id", onupdate="CASCADE", ondelete="CASCADE"))
     registration_date = Column(Date)
 
     user = relationship("User", back_populates="registrations")
@@ -137,8 +136,8 @@ class UserVolunteerOrg(Base):
     __tablename__ = "user_volunteer_org"
 
     user_volunteer_org_id = Column(Integer, primary_key=True, unique=True)
-    user_id = Column(Integer, ForeignKey("user.user_id"))
-    vol_id = Column(Integer, ForeignKey("volunteer_org.vol_id"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
+    vol_id = Column(Integer, ForeignKey("volunteer_org.vol_id", onupdate="CASCADE", ondelete="CASCADE"))
     join_date = Column(Date)
 
     user = relationship("User", back_populates="volunteer_orgs")
@@ -168,8 +167,8 @@ class RolePermission(Base):
     __tablename__ = "rolepermission"
 
     rolepermissions_id = Column(Integer, primary_key=True, unique=True)
-    role_id = Column(Integer, ForeignKey("role.role_id"))
-    permission_id = Column(Integer, ForeignKey("permission.permission_id"))
+    role_id = Column(Integer, ForeignKey("role.role_id", onupdate="CASCADE", ondelete="CASCADE"))
+    permission_id = Column(Integer, ForeignKey("permission.permission_id", onupdate="CASCADE", ondelete="CASCADE"))
 
     role = relationship("Role", back_populates="permissions")
     permission = relationship("Permission", back_populates="role_permissions")
@@ -178,8 +177,8 @@ class UserPermission(Base):
     __tablename__ = "user_permission"
 
     user_permission_id = Column(Integer, primary_key=True, unique=True)
-    user_id = Column(Integer, ForeignKey("user.user_id"))
-    permission_id = Column(Integer, ForeignKey("permission.permission_id"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
+    permission_id = Column(Integer, ForeignKey("permission.permission_id", onupdate="CASCADE", ondelete="CASCADE"))
 
     user = relationship("User", back_populates="permissions")
     permission = relationship("Permission", back_populates="user_permissions")
@@ -188,8 +187,8 @@ class UserRole(Base):
     __tablename__ = "user_role"
 
     user_role_id = Column(Integer, primary_key=True, unique=True)
-    role_id = Column(Integer, ForeignKey("role.role_id"))
-    user_id = Column(Integer, ForeignKey("user.user_id"))
+    role_id = Column(Integer, ForeignKey("role.role_id", onupdate="CASCADE", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
 
     user = relationship("User", back_populates="roles")
     role = relationship("Role", back_populates="users")
