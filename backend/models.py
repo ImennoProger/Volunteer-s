@@ -112,6 +112,7 @@ class Event(Base):
     city = relationship("City", back_populates="events")
     category = relationship("Category", back_populates="events")
     creator = relationship("User", back_populates="events")
+    registrations = relationship("EventRegistration", back_populates="event") # fixed 18.07
 
 class Category(Base):
     __tablename__ = "category"
