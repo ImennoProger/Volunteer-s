@@ -4,12 +4,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from models import User
+
 from database import SessionLocal, engine
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
-
+from models import Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User
 
 app = FastAPI()
 
@@ -18,6 +17,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 origins = [
     "*"
 ]
+
+def get_session_local():
+    yield SessionLocal()
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,28 +44,34 @@ SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-
-class UserCreate(BaseModel):
-    username: str
-    password: str
-
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    return db.query(UserMetadata).filter(UserMetadata.email == email).first()
 
-def create_user(db: Session, user: UserCreate):
-    hashed_password = pwd_context.hash(user.password)
-    db_user = User(email=user.username, hashed_password=hashed_password)
-    db.add(db_user)
+def create_user_metadata(db: Session, user_metadata: UserMetadataCreate):
+
+    hashed_password = pwd_context.hash(user_metadata.hashed_password)
+    db_user_metadata = UserMetadata(
+        email=user_metadata.username, ##email из UserMetadata, user_metadata.username из UserMetadataCreate, куда и идёт запрос на регу
+        user_name=user_metadata.user_name,
+        user_surname=user_metadata.user_surname,
+        user_patronymic=user_metadata.user_patronymic,
+        hashed_password=hashed_password,
+        age=user_metadata.age,
+        country_id=user_metadata.country,
+        city_id=user_metadata.city)
+
+    db.add(db_user_metadata)
     db.commit()
-    return "complete"
+    db.refresh(db_user_metadata)
+    return db_user_metadata
 
 @app.post("/register")
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user_by_email(db, email=user.username)
-    if db_user:
+def register_user(user_metadata: UserMetadataCreate, db: Session = Depends(get_session_local)):
+    db_user_metadata = get_user_by_email(db, email=user_metadata.username)
+    if db_user_metadata:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return create_user(db=db, user=user)
-
+    return create_user_metadata(db=db, user_metadata=user_metadata)
+    
 # Authenticate the user
 def authenticate_user(email: str, password: str, db: Session):
     user = db.query(User).filter(User.email == email).first()
@@ -114,3 +122,12 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 async def verify_user_token(token: str):
     verify_token(token=token)
     return {"message": "Token is valid"}
+
+@app.get("/countries/", response_model=list[CountryCreate])
+def read_countries(db: Session = Depends(get_db)):
+    return db.query(Country).all()
+
+
+@app.get("/cities/{country_id}", response_model=list[CityCreate])
+def read_cities(country_id: int, db: Session = Depends(get_db)):
+    return db.query(City).filter(City.country_id == country_id).all()
