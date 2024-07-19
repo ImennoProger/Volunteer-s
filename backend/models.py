@@ -1,40 +1,70 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event
 from sqlalchemy.orm import relationship
 from database import Base, engine
+from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime, timedelta
+
+class UserMetadata(Base):
+    __tablename__ = "user_metadata"
+
+    user_metadata_id = Column(Integer, primary_key=True, unique=True, index=True)
+    email = Column(String, unique=True)
+    hashed_password = Column(String)
+    user_name = Column(String)
+    user_surname = Column(String)
+    user_patronymic = Column(String)
+    age = Column(String)
+
+
+    country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
+    city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
+    role_id = Column(Integer)
+
+    country = relationship("Country", back_populates="users")
+    city = relationship("City", back_populates="users")
+
+    __table_args__ = (
+        UniqueConstraint('email', name='uq_user_metadata_email'),
+        UniqueConstraint('hashed_password', name='uq_user_metadata_hashed_password'),
+    )
 
 class User(Base):
     __tablename__ = "user"
 
-    user_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, primary_key=True, unique=True, index=True)
+    email = Column(String, unique=True)
     hashed_password = Column(String)
-    email = Column(String)
     createdat = Column(TIMESTAMP)
 
-    user_metadata = relationship("UserMetadata", back_populates="user")
+    user_metadata_id = Column(Integer, ForeignKey("user_metadata.user_metadata_id", onupdate="CASCADE", ondelete="CASCADE"))
+
     events = relationship("Event", back_populates="creator")
     permissions = relationship("UserPermission", back_populates="user")
     roles = relationship("UserRole", back_populates="user")
     registrations = relationship("EventRegistration", back_populates="user")
     volunteer_orgs = relationship("UserVolunteerOrg", back_populates="user")
 
-class UserMetadata(Base):
-    __tablename__ = "user_metadata"
 
-    user_metadata_id = Column(Integer, primary_key=True, unique=True, index=True)
-    user_name = Column(String)
-    user_surname = Column(String)
-    user_patronymic = Column(String)
-    user_email = Column(String, unique=True)
-    country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
-    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
-    city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
-    role_id = Column(Integer)
-    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
+# Событие для синхронизации данных
+@event.listens_for(UserMetadata, 'after_insert')
+def create_user_from_metadata(mapper, connection, target):
+    connection.execute(
+        User.__table__.insert().values(
+            email=target.email,
+            hashed_password=target.hashed_password,
+            user_metadata_id=target.user_metadata_id
+        )
+    )
 
-    user = relationship("User", back_populates="user_metadata")
-    country = relationship("Country", back_populates="users")
-    region = relationship("Region", back_populates="users")
-    city = relationship("City", back_populates="users")
+# Обновление данных при изменении
+@event.listens_for(UserMetadata, 'after_update')
+def update_user_from_metadata(mapper, connection, target):
+    connection.execute(
+        User.__table__.update().
+        where(User.user_metadata_id == target.user_metadata_id).
+        values(email=target.email, hashed_password=target.hashed_password)
+    )
 
 class Role(Base):
     __tablename__ = "role"
@@ -45,15 +75,18 @@ class Role(Base):
     users = relationship("UserRole", back_populates="role")
     permissions = relationship("RolePermission", back_populates="role")
 
-class Region(Base):
-    __tablename__ = "region"
+class Country(Base):
+    __tablename__ = "country"
 
-    region_id = Column(Integer, primary_key=True, unique=True)
-    region_name = Column(String)
+    country_id = Column(Integer, primary_key=True, unique=True)
+    country_name = Column(String)
 
-    users = relationship("UserMetadata", back_populates="region")
-    events = relationship("Event", back_populates="region")
-    volunteer_orgs = relationship("VolunteerOrg", back_populates="region")
+    city = relationship("City", back_populates="country")
+    users = relationship("UserMetadata", back_populates="country")
+    events = relationship("Event", back_populates="country")
+    volunteer_orgs = relationship("VolunteerOrg", back_populates="country")
+    class Config:
+        from_attributes= True
 
 class City(Base):
     __tablename__ = "city"
@@ -61,9 +94,13 @@ class City(Base):
     city_id = Column(Integer, primary_key=True, unique=True)
     city_name = Column(String)
 
+    country_id = Column(Integer, ForeignKey("country.country_id"))
+    country = relationship("Country", back_populates="city")
     users = relationship("UserMetadata", back_populates="city")
     events = relationship("Event", back_populates="city")
     volunteer_orgs = relationship("VolunteerOrg", back_populates="city")
+    class Config:
+        from_attributes= True
 
 class VolunteerOrg(Base):
     __tablename__ = "volunteer_org"
@@ -72,7 +109,6 @@ class VolunteerOrg(Base):
     vol_name = Column(String)
     vol_description = Column(String)
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
-    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
     vol_foundation_date = Column(Date)
     vol_contact_person = Column(Integer)
@@ -82,9 +118,10 @@ class VolunteerOrg(Base):
     vol_count_members = Column(Integer)
 
     country = relationship("Country", back_populates="volunteer_orgs")
-    region = relationship("Region", back_populates="volunteer_orgs")
     city = relationship("City", back_populates="volunteer_orgs")
     members = relationship("UserVolunteerOrg", back_populates="volunteer_org")
+    class Config:
+        from_attributes= True
 
 class Event(Base):
     __tablename__ = "event"
@@ -96,7 +133,6 @@ class Event(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
-    region_id = Column(Integer, ForeignKey("region.region_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
     category_id = Column(Integer, ForeignKey("category.category_id", onupdate="CASCADE", ondelete="SET NULL"))
     required_volunteers = Column(Integer)
@@ -108,11 +144,12 @@ class Event(Base):
     event_status = Column(Boolean)
 
     country = relationship("Country", back_populates="events")
-    region = relationship("Region", back_populates="events")
     city = relationship("City", back_populates="events")
     category = relationship("Category", back_populates="events")
     creator = relationship("User", back_populates="events")
-    registrations = relationship("EventRegistration", back_populates="event") # fixed 18.07
+    registrations = relationship("EventRegistration", back_populates="event")
+    class Config:
+        from_attributes= True
 
 class Category(Base):
     __tablename__ = "category"
@@ -121,6 +158,8 @@ class Category(Base):
     category_name = Column(String, unique=True)
 
     events = relationship("Event", back_populates="category")
+    class Config:
+        from_attributes= True
 
 class EventRegistration(Base):
     __tablename__ = "event_registration"
@@ -132,6 +171,8 @@ class EventRegistration(Base):
 
     user = relationship("User", back_populates="registrations")
     event = relationship("Event", back_populates="registrations")
+    class Config:
+        from_attributes= True
 
 class UserVolunteerOrg(Base):
     __tablename__ = "user_volunteer_org"
@@ -143,16 +184,8 @@ class UserVolunteerOrg(Base):
 
     user = relationship("User", back_populates="volunteer_orgs")
     volunteer_org = relationship("VolunteerOrg", back_populates="members")
-
-class Country(Base):
-    __tablename__ = "country"
-
-    country_id = Column(Integer, primary_key=True, unique=True)
-    country_name = Column(String)
-
-    users = relationship("UserMetadata", back_populates="country")
-    events = relationship("Event", back_populates="country")
-    volunteer_orgs = relationship("VolunteerOrg", back_populates="country")
+    class Config:
+        from_attributes= True
 
 class Permission(Base):
     __tablename__ = "permission"
@@ -163,6 +196,8 @@ class Permission(Base):
 
     user_permissions = relationship("UserPermission", back_populates="permission")
     role_permissions = relationship("RolePermission", back_populates="permission")
+    class Config:
+        from_attributes= True
 
 class RolePermission(Base):
     __tablename__ = "rolepermission"
@@ -173,6 +208,8 @@ class RolePermission(Base):
 
     role = relationship("Role", back_populates="permissions")
     permission = relationship("Permission", back_populates="role_permissions")
+    class Config:
+        from_attributes= True
 
 class UserPermission(Base):
     __tablename__ = "user_permission"
@@ -183,6 +220,8 @@ class UserPermission(Base):
 
     user = relationship("User", back_populates="permissions")
     permission = relationship("Permission", back_populates="user_permissions")
+    class Config:
+        from_attributes= True
 
 class UserRole(Base):
     __tablename__ = "user_role"
@@ -193,6 +232,31 @@ class UserRole(Base):
 
     user = relationship("User", back_populates="roles")
     role = relationship("Role", back_populates="users")
+    class Config:
+        from_attributes= True
+
+class UserMetadataCreate(BaseModel):
+    username: str  # для совместимости с запросом
+    hashed_password: str
+    user_name: str
+    user_surname: str
+    user_patronymic: str
+    age: int
+    country: int###########
+    city: int###########
+
+class CountryCreate(BaseModel):
+    country_id: int
+    country_name: str
+    class Config:
+        from_attributes = True
+
+class CityCreate(BaseModel):
+    city_id: int
+    country_id: int
+    city_name: str
+    class Config:
+        from_attributes = True
 
 # Создание таблиц в базе данных, если они не существуют
 Base.metadata.create_all(bind=engine)

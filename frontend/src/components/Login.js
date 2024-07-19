@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './styles/Login.css';
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); //username - email
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -59,26 +59,34 @@ function Login() {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>email:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+        <div className="login-container">
+          <div className="card-container">
+            <div className="card">
+              <span className="card-title">Авторизация</span>
+              <div className="input-field">
+                <label>Электронная почта:</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Пароль:</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Link to="/reset-password" className="forgot-password">Забыли пароль?</Link>
+              <button className="btn waves-effect waves-light btn-login" type="submit" disabled={loading}>
+                {loading ? 'Вход...' : 'Войти'}
+              </button>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+            </div>
+          </div>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Вход...' : 'Войти'}
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
     </div>
   );
