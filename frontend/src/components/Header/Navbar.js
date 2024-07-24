@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImage from '../components/logo192.png'; 
-import './styles/Navbar.css'
+import logoImage from './logo192.png'; 
+import './Navbar.css'
 
 const Navbar = () => {
   return (
@@ -14,6 +14,7 @@ const Navbar = () => {
           <li><Link to="/" className="brand-logo center">Волонтерский портал</Link></li>
         </ul>
         <ul className="right hide-on-med-and-down">
+          <li><Link to="/volunteer">Волонтер</Link></li>
           <li><Link to="/login">Войти</Link></li>
           <li><Link to="/register">Зарегистрироваться</Link></li>
         </ul>

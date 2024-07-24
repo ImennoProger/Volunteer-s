@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/ResetPassword.css'; // Подключаем файл стилей для страницы восстановления пароля
+import './ResetPassword.css'; // Подключаем файл стилей для страницы восстановления пароля
 
 const ResetPassword = () => {
   return (

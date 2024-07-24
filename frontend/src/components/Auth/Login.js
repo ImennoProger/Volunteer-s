@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './styles/Login.css';
+import './Login.css';
 
 function Login() {
   const [username, setUsername] = useState(''); //username - email
@@ -30,7 +30,7 @@ function Login() {
     formDetails.append('password', password);
 
     try {
-      const response = await fetch('http://185.242.118.144:8000/token', {
+      const response = await fetch('http://localhost:8000/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

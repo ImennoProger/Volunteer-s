@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/Register.css'; // Подключаем файл стилей для страницы регистрации
+import './Register.css'; // Подключаем файл стилей для страницы регистрации
 
 function Register () {
 
@@ -21,7 +21,7 @@ function Register () {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://185.242.118.144:8000/countries/')  // Полный URL-адрес
+    fetch('http://localhost:8000/countries/')  // Полный URL-адрес
       .then(response => {
         console.log(response);
         if (!response.ok) {
@@ -39,7 +39,7 @@ function Register () {
     setCity(''); // Сбрасываем выбранный город при изменении страны
 
     // Загрузка списка городов для выбранной страны
-    fetch(`http://185.242.118.144:8000/cities/${selectedCountry}`)
+    fetch(`http://localhost:8000/cities/${selectedCountry}`)
       .then(response => response.json())
       .then(data => setCities(data))
       .catch(error => console.error('Ошибка при загрузке городов:', error));
@@ -61,7 +61,7 @@ function Register () {
 
     try {
       
-      const response = await fetch('http://185.242.118.144:8000/register', {
+      const response = await fetch('http://localhost:8000/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
