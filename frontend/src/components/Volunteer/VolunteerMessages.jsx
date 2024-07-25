@@ -1,17 +1,17 @@
 import React from 'react';
-import { Typography, Box } from '@mui/joy';
+import { Typography, Box, Paper } from '@mui/material';
 
 const VolunteerMessages = ({ messages }) => {
   return (
-    <div>
+    <Paper elevation={3} sx={{ p: 4 }}>
       <Box>
         {messages.map((message, index) => (
-          <div key={index}>
+          <Box key={index} sx={{ mb: 2 }}>
             <Typography>{message.content}</Typography>
-          </div>
+          </Box>
         ))}
       </Box>
-    </div>
+    </Paper>
   );
 };
 

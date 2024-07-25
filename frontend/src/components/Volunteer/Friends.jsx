@@ -1,15 +1,17 @@
 import React from 'react';
-import { Typography, Box } from '@mui/joy';
+import { Typography, Box, Paper } from '@mui/material';
 
 const Friends = ({ friends }) => {
   return (
-    <div>
+    <Paper elevation={3} sx={{ p: 4 }}>
       <Box>
         {friends.map((friend, index) => (
-          <Typography key={index}>{friend.name}</Typography>
+          <Typography key={index} sx={{ mb: 1 }}>
+            {friend.name}
+          </Typography>
         ))}
       </Box>
-    </div>
+    </Paper>
   );
 };
 

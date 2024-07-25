@@ -1,11 +1,11 @@
 import React from 'react';
-import { Typography } from '@mui/joy';
+import { Typography, Paper } from '@mui/material';
 
 const Balance = ({ coins }) => {
   return (
-    <div>
+    <Paper elevation={3} sx={{ p: 4 }}>
       <Typography>Монеты: {coins}</Typography>
-    </div>
+    </Paper>
   );
 };
 

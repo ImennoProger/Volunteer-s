@@ -8,9 +8,9 @@ import Navbar from './components/Header/Navbar';
 import Home from './pages/Home';
 import ProtectedPage from './pages/Protected';
 import VolunteerPage from './pages/VolunteerPage';
-//import CityAdminPage from './pages/CityAdminPage';
-//import RegionAdminPage from './pages/RegionAdminPage';
-//import SuperUserPage from './pages/SuperUserPage';
+import CityAdminPage from './pages/CityAdminPage';
+import RegionAdminPage from './pages/RegionAdminPage';
+import SuperUserPage from './pages/SuperUserPage';
 
 const App = () => {
   return (
@@ -24,9 +24,9 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/volunteer" element={<VolunteerPage />} />
-          {/* <Route path="/city-admin" element={<CityAdminPage />} />
+          <Route path="/city-admin" element={<CityAdminPage />} />
           <Route path="/region-admin" element={<RegionAdminPage />} />
-          <Route path="/superuser" element={<SuperUserPage />} /> */}
+          <Route path="/superuser" element={<SuperUserPage />} /> 
         </Routes>
       </div>
     </div>

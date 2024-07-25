@@ -1,15 +1,17 @@
 import React from 'react';
-import { Typography, Box } from '@mui/joy';
+import { Typography, Box, Paper } from '@mui/material';
 
 const Groups = ({ groups }) => {
   return (
-    <div>
+    <Paper elevation={3} sx={{ p: 4 }}>
       <Box>
         {groups.map((group, index) => (
-          <Typography key={index}>{group.name}</Typography>
+          <Typography key={index} sx={{ mb: 1 }}>
+            {group.name}
+          </Typography>
         ))}
       </Box>
-    </div>
+    </Paper>
   );
 };
 

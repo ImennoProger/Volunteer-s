@@ -1,8 +1,7 @@
-// src/components/Volunteer/VolunteerProfile.jsx
 import React, { useState } from 'react';
 import { Avatar, Button, TextField, Typography, Paper, Box } from '@mui/material';
 
-const VolunteerProfile = () => {
+const SuperUserProfile = () => {
   const [profile, setProfile] = useState({
     photo: '',
     email: '',
@@ -141,4 +140,4 @@ const VolunteerProfile = () => {
   );
 };
 
-export default VolunteerProfile;
+export default SuperUserProfile;

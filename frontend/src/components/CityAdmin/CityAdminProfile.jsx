@@ -1,8 +1,8 @@
-// src/components/Volunteer/VolunteerProfile.jsx
+// src/components/CityAdmin/CityAdminProfile.jsx
 import React, { useState } from 'react';
 import { Avatar, Button, TextField, Typography, Paper, Box } from '@mui/material';
 
-const VolunteerProfile = () => {
+const CityAdminProfile = () => {
   const [profile, setProfile] = useState({
     photo: '',
     email: '',
@@ -141,4 +141,4 @@ const VolunteerProfile = () => {
   );
 };
 
-export default VolunteerProfile;
+export default CityAdminProfile;
