@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship, declarative_base
 from pydantic import BaseModel
 from datetime import datetime
 
-
 # Создаем экземпляр MetaData
 metadata = MetaData()
 
@@ -21,6 +20,7 @@ class UserMetadata(Base):
     user_patronymic = Column(String)
     age = Column(String)
     isActive = Column(Boolean, default=False)
+
 
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
