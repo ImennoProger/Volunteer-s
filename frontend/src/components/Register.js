@@ -73,7 +73,8 @@ function Register () {
       if (response.ok) {
         navigate('/login');
       } else {
-        setError('Ошибка при регистрации');
+        const errorData = await response.json();
+        setError(errorData.detail || 'Authentication failed!');
       }
     } catch (error) {
       setLoading(false);
