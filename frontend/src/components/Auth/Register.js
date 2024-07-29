@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/Register.css'; // Подключаем файл стилей для страницы регистрации
+import './Register.css'; // Подключаем файл стилей для страницы регистрации
 
 function Register () {
 
