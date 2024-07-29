@@ -44,7 +44,7 @@ function Login() {
 
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
-        navigate('/protected');
+        navigate('/Protected');
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Authentication failed!');
