@@ -1,11 +1,10 @@
-import { Link } from 'react-router-dom';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Snackbar, Alert, Button } from '@mui/material';
 import './Register.css'; // Подключаем файл стилей для страницы регистрации
 
-function Register () {
-
-  const [username, setUsername] = useState(''); //username - email
+function Register() {
+  const [username, setUsername] = useState(''); // email
   const [hashed_password, setHashed_password] = useState('');
   const [user_surname, setUser_surname] = useState('');
   const [user_name, setUser_name] = useState('');
@@ -17,13 +16,14 @@ function Register () {
   const [city, setCity] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Состояние для открытия Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetch('http://185.242.118.144:8000/countries/')  // Полный URL-адрес
       .then(response => {
-        console.log(response);
         if (!response.ok) {
           throw new Error('Ошибка HTTP ' + response.status);
         }
@@ -60,18 +60,21 @@ function Register () {
     setLoading(true);
 
     try {
-      
       const response = await fetch('http://185.242.118.144:8000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, hashed_password, user_surname, user_name, user_patronymic, age, country, city }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, hashed_password, user_surname, user_name, user_patronymic, age, country, city }),
       });
 
       setLoading(false);
       if (response.ok) {
-        navigate('/login');
+        setSnackbarMessage('На вашу электронную почту было отправлено письмо для подтверждения.');
+        setOpenSnackbar(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 5000); // Перенаправление через 3 секунды
       } else {
         setError('Ошибка при регистрации');
       }
@@ -81,6 +84,9 @@ function Register () {
     }
   };
 
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <div className="page-container">
@@ -189,6 +195,22 @@ function Register () {
           </form>
         </div>
       </div>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        action={
+          <Button color="inherit" onClick={handleCloseSnackbar}>
+            Закрыть
+          </Button>
+        }
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
