@@ -17,22 +17,40 @@ const ManageEvents = () => {
     {
       id: 1,
       name: 'Концерт в парке',
-      shortDescription: 'Музыкальное мероприятие под открытым небом',
-      fullDescription: 'Полное описание концерта в парке...',
+      description: 'Музыкальное мероприятие под открытым небом',
+      shortDescription: 'Приходите насладиться живой музыкой!',
       requiredPeople: 100,
+      registeredPeople: 50,
       points: 10,
       awards: 'Билет на следующее мероприятие',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
+      imageUrl: 'https://via.placeholder.com/150',
+      latitude: 55.751244,
+      longitude: 37.618423,
+      startDate: '2024-08-10',
+      endDate: '2024-08-12',
+      country: 'Россия',
+      city: 'Москва',
+      region: 'Центральный федеральный округ',
+      category: 'Культура',
     },
     {
       id: 2,
       name: 'Спортивное соревнование',
-      shortDescription: 'Соревнование по бегу на длинные дистанции',
-      fullDescription: 'Полное описание спортивного соревнования...',
+      description: 'Соревнование по бегу на длинные дистанции',
+      shortDescription: 'Примите участие в забеге и получите призы!',
       requiredPeople: 200,
+      registeredPeople: 180,
       points: 15,
       awards: 'Медаль и грамота',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
+      imageUrl: 'https://via.placeholder.com/150',
+      latitude: 55.755826,
+      longitude: 37.6173,
+      startDate: '2024-08-15',
+      endDate: '2024-08-20',
+      country: 'Россия',
+      city: 'Москва',
+      region: 'Центральный федеральный округ',
+      category: 'Спорт',
     },
   ]);
 
@@ -44,6 +62,8 @@ const ManageEvents = () => {
     points: '',
     awards: '',
     imageUrl: '',
+    startDate: '',
+    endDate: '',
   });
 
   const handleChange = (e) => {
@@ -74,6 +94,8 @@ const ManageEvents = () => {
       points: '',
       awards: '',
       imageUrl: '',
+      startDate: '',
+      endDate: '',
     });
   };
 
@@ -111,6 +133,12 @@ const ManageEvents = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Награды: {event.awards}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Дата начала: {event.startDate}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Дата окончания: {event.endDate}
                 </Typography>
               </CardContent>
               <CardActions>
@@ -184,16 +212,36 @@ const ManageEvents = () => {
           onChange={handleChange}
           sx={{ mb: 2 }}
         />
+        <TextField
+          fullWidth
+          label="Дата начала"
+          name="startDate"
+          type="date"
+          value={newEvent.startDate}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Дата окончания"
+          name="endDate"
+          type="date"
+          value={newEvent.endDate}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+        />
         <div>
-        <Button variant="contained" component="label" sx={{ mb: 2 }}>
-          Загрузить изображение
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-        </Button>
+          <Button variant="contained" component="label" sx={{ mb: 2 }}>
+            Загрузить изображение
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Button>
         </div>
         <Button variant="contained" color="primary" type="submit">
           Создать мероприятие

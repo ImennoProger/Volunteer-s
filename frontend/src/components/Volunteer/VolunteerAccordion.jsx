@@ -28,10 +28,12 @@ const VolunteerAccordion = ({ rank, points, awards, completedEvents, friends, gr
 
       <Accordion sx={{ mb: 2 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Мероприятия на карте</Typography>
+          <Typography> Мероприятия на карте </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <VolunteerEvents />
+          <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <VolunteerEvents />
+          </Box>
         </AccordionDetails>
       </Accordion>
 

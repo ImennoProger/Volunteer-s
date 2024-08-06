@@ -6,11 +6,12 @@ const SuperUserProfile = () => {
     photo: '',
     email: '',
     password: '',
-    fullName: '',
+    surname: '',
+    name: '',
+    patronymic: '',
     age: '',
     country: '',
     city: '',
-    username: '',
   });
 
   const handleChange = (e) => {
@@ -72,14 +73,6 @@ const SuperUserProfile = () => {
         )}
         <TextField
           fullWidth
-          label="Username"
-          name="username"
-          value={profile.username}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
           label="Email"
           name="email"
           value={profile.email}
@@ -97,8 +90,24 @@ const SuperUserProfile = () => {
         />
         <TextField
           fullWidth
-          label="ФИО"
+          label="Фамилия"
           name="fullName"
+          value={profile.fullName}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Имя"
+          name="name"
+          value={profile.fullName}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Отчество"
+          name="patronymic"
           value={profile.fullName}
           onChange={handleChange}
           sx={{ mb: 2 }}

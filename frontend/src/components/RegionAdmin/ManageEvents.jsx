@@ -23,6 +23,8 @@ const ManageEvents = () => {
       points: 10,
       awards: 'Билет на следующее мероприятие',
       imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
+      startDate: '2024-08-10',
+      endDate: '2024-08-12',
     },
     {
       id: 2,
@@ -33,6 +35,8 @@ const ManageEvents = () => {
       points: 15,
       awards: 'Медаль и грамота',
       imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
+      startDate: '2024-08-15',
+      endDate: '2024-08-20',
     },
   ]);
 
@@ -44,6 +48,8 @@ const ManageEvents = () => {
     points: '',
     awards: '',
     imageUrl: '',
+    startDate: '',
+    endDate: '',
   });
 
   const handleChange = (e) => {
@@ -74,6 +80,8 @@ const ManageEvents = () => {
       points: '',
       awards: '',
       imageUrl: '',
+      startDate: '',
+      endDate: '',
     });
   };
 
@@ -112,6 +120,12 @@ const ManageEvents = () => {
                 <Typography variant="body2" color="text.secondary">
                   Награды: {event.awards}
                 </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Дата начала: {event.startDate}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Дата окончания: {event.endDate}
+                </Typography>
               </CardContent>
               <CardActions>
                 <Button
@@ -127,7 +141,7 @@ const ManageEvents = () => {
         ))}
       </Grid>
       <Box component="form" onSubmit={handleCreateEvent} sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
           Создать новое мероприятие
         </Typography>
         <TextField
@@ -182,6 +196,26 @@ const ManageEvents = () => {
           name="awards"
           value={newEvent.awards}
           onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Дата начала"
+          name="startDate"
+          type="date"
+          value={newEvent.startDate}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Дата окончания"
+          name="endDate"
+          type="date"
+          value={newEvent.endDate}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
           sx={{ mb: 2 }}
         />
         <div>
