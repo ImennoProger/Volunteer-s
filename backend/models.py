@@ -249,6 +249,21 @@ class UserMetadataCreate(BaseModel):
     country: int
     city: int
 
+class UserMetadataRead(BaseModel):
+    user_metadata_id: int
+    email: str
+    user_name: str
+    user_surname: str
+    user_patronymic: str
+    age: str
+    isActive: bool
+    country_id: int
+    city_id: int
+    #role_id: int
+
+    class Config:
+        from_attributes = True
+
 class CountryCreate(BaseModel):
     country_id: int
     country_name: str
@@ -262,3 +277,33 @@ class CityCreate(BaseModel):
     class Config:
         from_attributes = True
 
+class EventRead(BaseModel):
+    event_id: int
+    event_name: str
+    short_description: str
+    full_description: str
+    start_date: datetime
+    end_date: datetime
+    category_name: str
+    required_volunteers: int
+    participation_points: int
+    rewards: int
+    registered_volunteers: int
+    country_name: str
+    city_name: str
+    user_id: int
+    creation_date: datetime
+    event_status: bool
+    class Config:
+        from_attributes = True
+
+class EventCreate(BaseModel):
+    event_name: str
+    short_description: str
+    full_description: str
+    start_date: str 
+    end_date: str
+    category_name: str
+    required_volunteers: int
+    participation_points: int
+    rewards: int
