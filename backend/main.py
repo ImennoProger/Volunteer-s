@@ -1,7 +1,9 @@
 from email.message import EmailMessage
 import smtplib
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
+import pydantic
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -11,8 +13,9 @@ from passlib.context import CryptContext
 from database import SessionLocal, engine
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User
+from models import Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate
 import ssl
+from sqlalchemy.orm import joinedload
 
 app = FastAPI()
 
@@ -33,7 +36,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -43,10 +45,166 @@ def get_db():
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Your JWT secret and algorithm
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+@app.delete("/users/{user_metadata_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_metadata_id: int, db: Session = Depends(get_db)):
+    user = db.query(UserMetadata).filter(UserMetadata.user_metadata_id == user_metadata_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    db.delete(user)
+    db.commit()
+
+    return {"message": "Пользователь удалён успешно"}
+
+@app.put("/users/block/{user_metadata_id}")
+def block_user(user_metadata_id: int, db: Session = Depends(get_db)):
+    user = db.query(UserMetadata).filter(UserMetadata.user_metadata_id == user_metadata_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    #user.isActive = False вместо isActive нужно добавить поле isBanned
+    #db.commit()
+
+    return {"message": "Пользователь заблокирован"}
+
+@app.put("/users/unblock/{user_metadata_id}")
+def unblock_user(user_metadata_id: int, db: Session = Depends(get_db)):
+    user = db.query(UserMetadata).filter(UserMetadata.user_metadata_id == user_metadata_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    #user.isActive = True   вместо isActive нужно добавить поле isBanned
+    #db.commit()
+
+    return {"message": "Пользователь разблокирован"}
+
+@app.get("/users/", response_model=List[UserMetadataRead])
+def read_users(db: Session = Depends(get_db)):
+    users = db.query(UserMetadata).all()
+    
+    if not users:
+        raise HTTPException(status_code=404, detail="Users not found")
+
+    return users
+
+@app.delete("/events/{event_id}", status_code=204)
+async def delete_event(event_id: int, db: Session = Depends(get_db)):
+    event = db.query(Event).filter(Event.event_id == event_id).first()
+    if event:
+        db.delete(event)
+        db.commit()
+    else:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+
+@app.post("/events/")
+def create_event(event: EventCreate, db: Session = Depends(get_session_local), token: str = Depends(oauth2_scheme)):
+    # Получаем текущего пользователя
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+
+    # Получаем данные из таблицы user_metadata
+    user_metadata = db.query(UserMetadata).filter(UserMetadata.email == current_user.email).first()
+    if not user_metadata:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    # Получаем user_id для текущего пользователя
+    user = db.query(User).filter(User.email == current_user.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден в таблице User")
+
+    # Получаем или создаем категорию
+    category = db.query(Category).filter(Category.category_name == event.category_name).first()
+    if not category:
+        # Если категория не найдена, создаем новую
+        category = Category(category_name=event.category_name)
+        db.add(category)
+        db.commit()  # Сохраняем категорию в базе данных
+        db.refresh(category)  # Получаем присвоенный category_id
+
+    # Создаем запись в таблице event
+    db_event = Event(
+        event_name=event.event_name,
+        short_description=event.short_description,
+        full_description=event.full_description,
+        start_date=datetime.strptime(event.start_date, '%Y-%m-%d'),
+        end_date=datetime.strptime(event.end_date, '%Y-%m-%d'),
+        country_id=user_metadata.country_id,
+        city_id=user_metadata.city_id,
+        category_id=category.category_id,  # Используем ID категории
+        required_volunteers=event.required_volunteers,
+        registered_volunteers=0,  # Начальное значение
+        participation_points=event.participation_points,
+        rewards=event.rewards,
+        user_id=user.user_id,  # Используем user_id из таблицы User
+        creation_date=datetime.utcnow(),
+        event_status=True
+    )
+    db.add(db_event)
+    db.commit()
+    db.refresh(db_event)
+    return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
+
+
+@app.get("/events/", response_model=List[EventRead])
+def read_events(db: Session = Depends(get_db)):
+    # Используем joinedload для предварительной загрузки связанных данных
+    events = db.query(Event).options(
+        joinedload(Event.country),
+        joinedload(Event.city),
+        joinedload(Event.category)
+    ).all()
+    
+    events_with_details = []
+    for event in events:
+        event_details = {
+            "event_id": event.event_id,
+            "event_name": event.event_name,
+            "short_description": event.short_description,
+            "full_description": event.full_description,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "category_name": event.category.category_name if event.category else None,
+            "required_volunteers": event.required_volunteers,
+            "participation_points": event.participation_points,
+            "rewards": event.rewards,
+            "registered_volunteers": event.registered_volunteers,
+            "country_name": event.country.country_name if event.country else None,
+            "city_name": event.city.city_name if event.city else None,
+            "user_id": event.user_id,
+            "creation_date": event.creation_date,
+            "event_status": event.event_status
+        }
+        events_with_details.append(event_details)
+    
+    return events_with_details
+
+
+class UserInDB(pydantic.BaseModel):
+    username: str
+    email: str
+
+def get_current_user(token: str, db: Session) -> User:
+    try:
+        # Декодирование JWT токена
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        # Получение пользователя из базы данных
+        user = db.query(UserMetadata).filter(UserMetadata.email == email).first()
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid authentication credentials: {str(e)}")
+
 
 def get_user_by_email(db: Session, email: str):
     return db.query(UserMetadata).filter(UserMetadata.email == email).first()

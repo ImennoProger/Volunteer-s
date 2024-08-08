@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Импортируем axios для HTTP-запросов
 import {
   Table,
   TableBody,
@@ -12,58 +13,119 @@ import {
 } from '@mui/material';
 
 const ManageVolunteers = () => {
-  const [volunteers, setVolunteers] = useState([
-    { id: 1, name: 'Волонтёр 1', status: 'active' },
-    { id: 2, name: 'Волонтёр 2', status: 'blocked' },
-    { id: 3, name: 'Волонтёр 3', status: 'active' },
-  ]);
+  // Инициализируем состояние для волонтеров
+  const [volunteers, setVolunteers] = useState([]);
 
-  const handleBlock = (id) => {
-    setVolunteers((prev) =>
-      prev.map((volunteer) =>
-        volunteer.id === id
-          ? { ...volunteer, status: 'blocked' }
-          : volunteer
-      )
-    );
+  // Функция для получения всех пользователей с сервера
+  const fetchVolunteers = async () => {
+    try {
+      const token = localStorage.getItem('token'); 
+      const response = await axios.get('http://185.242.118.144:8000/users/', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setVolunteers(response.data); 
+    } catch (error) {
+      console.error('Ошибка при получении волонтеров:', error.response?.data || error.message);
+    }
   };
 
-  const handleUnblock = (id) => {
-    setVolunteers((prev) =>
-      prev.map((volunteer) =>
-        volunteer.id === id
-          ? { ...volunteer, status: 'active' }
-          : volunteer
-      )
-    );
+  // Используем useEffect для получения данных при монтировании компонента
+  useEffect(() => {
+    fetchVolunteers(); // Вызываем функцию получения данных
+  }, []); // Пустой массив зависимостей означает, что эффект выполнится один раз при монтировании
+
+  // Функция для блокировки волонтера
+  /*const handleBlock = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:8000/users/block/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setVolunteers((prev) =>
+        prev.map((volunteer) =>
+          volunteer.user_metadata_id === id
+            ? { ...volunteer, isActive: false }
+            : volunteer
+        )
+      );
+    } catch (error) {
+      console.error('Ошибка при блокировке волонтера:', error.response?.data || error.message);
+    }
   };
 
-  const handleDelete = (id) => {
-    setVolunteers((prev) => prev.filter((volunteer) => volunteer.id !== id));
+  // Функция для разблокировки волонтера
+  const handleUnblock = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:8000/users/unblock/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setVolunteers((prev) =>
+        prev.map((volunteer) =>
+          volunteer.user_metadata_id === id
+            ? { ...volunteer, isActive: true }
+            : volunteer
+        )
+      );
+    } catch (error) {
+      console.error('Ошибка при разблокировке волонтера:', error.response?.data || error.message);
+    }
+  };*/
+
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://185.242.118.144:8000/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setVolunteers((prev) => prev.filter((volunteer) => volunteer.user_metadata_id !== id));
+    } catch (error) {
+      console.error('Ошибка при удалении волонтера:', error.response?.data || error.message);
+    }
   };
 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h5" component="h2" gutterBottom>
+        Управление волонтёрами
+      </Typography>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Имя</TableCell>
+              <TableCell>Фамилия</TableCell>
+              <TableCell>Email</TableCell>
               <TableCell>Статус</TableCell>
               <TableCell>Действия</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {volunteers.map((volunteer) => (
-              <TableRow key={volunteer.id}>
-                <TableCell>{volunteer.name}</TableCell>
-                <TableCell>{volunteer.status === 'active' ? 'Активный' : 'Заблокирован'}</TableCell>
+              <TableRow key={volunteer.user_metadata_id}>
+                <TableCell>{volunteer.user_name}</TableCell>
+                <TableCell>{volunteer.user_surname}</TableCell>
+                <TableCell>{volunteer.email}</TableCell> 
                 <TableCell>
-                  {volunteer.status === 'active' ? (
+                  {volunteer.isActive ? 'Активный' : 'Заблокирован'}
+                </TableCell>
+                <TableCell>
+                  {volunteer.isActive ? (
                     <Button
                       variant="outlined"
                       color="secondary"
-                      onClick={() => handleBlock(volunteer.id)}
+                      //onClick={() => handleBlock(volunteer.user_id)}
                       sx={{ mr: 1 }}
                     >
                       Заблокировать
@@ -72,7 +134,7 @@ const ManageVolunteers = () => {
                     <Button
                       variant="outlined"
                       color="primary"
-                      onClick={() => handleUnblock(volunteer.id)}
+                      //onClick={() => handleUnblock(volunteer.user_id)}
                       sx={{ mr: 1 }}
                     >
                       Разблокировать
@@ -81,7 +143,7 @@ const ManageVolunteers = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => handleDelete(volunteer.id)}
+                    onClick={() => handleDelete(volunteer.user_metadata_id)}
                   >
                     Удалить
                   </Button>
@@ -96,4 +158,3 @@ const ManageVolunteers = () => {
 };
 
 export default ManageVolunteers;
-
