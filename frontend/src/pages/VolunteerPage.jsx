@@ -1,4 +1,3 @@
-// src/pages/VolunteerPage.jsx
 import React from 'react';
 import { Container, Grid, Paper } from '@mui/material';
 import VolunteerProfile from '../components/Volunteer/VolunteerProfile';
@@ -15,7 +14,7 @@ const completedEvents = ['Event 1', 'Event 2'];
 
 const VolunteerPage = () => {
   return (
-    <Container>
+    <Container sx={{ marginTop: '40px' }}> 
       <Grid container spacing={4}>
         {/* Профиль волонтера слева */}
         <Grid item xs={12} md={4}>

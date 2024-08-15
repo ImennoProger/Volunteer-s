@@ -5,7 +5,7 @@ import CityAdminAccordion from '../components/CityAdmin/CityAdminAccordion';
 
 const CityAdminPage = () => {
   return (
-    <Container>
+    <Container sx={{ marginTop: '40px' }}> 
       <Grid container spacing={4}>
         {/* Профиль администратора города слева */}
         <Grid item xs={12} md={4}>

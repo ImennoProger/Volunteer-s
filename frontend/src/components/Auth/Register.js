@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Snackbar, Alert, Button } from '@mui/material';
-import './Register.css'; // Подключаем файл стилей для страницы регистрации
+import './Register.css'; 
 
 function Register() {
   const [username, setUsername] = useState(''); // email
@@ -16,7 +16,7 @@ function Register() {
   const [city, setCity] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false); // Состояние для открытия Snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false); 
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const navigate = useNavigate();
@@ -74,7 +74,7 @@ function Register() {
         setOpenSnackbar(true);
         setTimeout(() => {
           navigate('/login');
-        }, 5000); // Перенаправление через 3 секунды
+        }, 5000); 
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Authentication failed!');

@@ -8,7 +8,6 @@ import {
   TableRow,
   Paper,
   Button,
-  Typography,
 } from '@mui/material';
 
 const ManageVolunteers = () => {

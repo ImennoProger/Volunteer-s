@@ -1,44 +1,55 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import React, { useEffect, useRef } from 'react';
+import { Map, View } from 'ol';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import { Point } from 'ol/geom';
+import { Icon, Style } from 'ol/style';
+import { Feature } from 'ol';
+import { fromLonLat } from 'ol/proj';
+import 'ol/ol.css';
 import customMarkerImage from './marker.png'; 
 
-// Создание иконки
-const customIcon = new L.Icon({
-  iconUrl: customMarkerImage,
-  iconSize: [32, 32], // [ширина, высота]
-  iconAnchor: [16, 32], // Позиция иконки относительно точки на карте
-  popupAnchor: [0, -32], // Позиция всплывающего окна относительно иконки
-  className: 'custom-marker', // Класс для дополнительных CSS-стилей
-});
-
 function EventMap({ events }) {
-  return (
-    <MapContainer
-      center={[55.751244, 37.618423]}
-      zoom={10}
-      style={{ height: '400px', width: '100%' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      {events.map((event, index) => (
-        <Marker
-          key={index}
-          position={[event.latitude, event.longitude]}
-          icon={customIcon} // Применяем кастомную иконку
-        >
-          <Popup>
-            <strong>{event.name}</strong>
-            <br />
-            {event.description}
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  );
+  const mapRef = useRef();
+
+  useEffect(() => {
+    const map = new Map({
+      target: mapRef.current,
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+        new VectorLayer({
+          source: new VectorSource({
+            features: events.map(event => {
+              const feature = new Feature({
+                geometry: new Point(fromLonLat([event.longitude, event.latitude])),
+                name: event.name,
+                description: event.description,
+              });
+              feature.setStyle(new Style({
+                image: new Icon({
+                  src: customMarkerImage,
+                  scale: 0.1,
+                }),
+              }));
+              return feature;
+            }),
+          }),
+        }),
+      ],
+      view: new View({
+        center: fromLonLat([37.618423, 55.751244]),
+        zoom: 10,
+      }),
+    });
+
+    return () => map.setTarget(undefined);
+  }, [events]);
+
+  return <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>;
 }
 
 export default EventMap;

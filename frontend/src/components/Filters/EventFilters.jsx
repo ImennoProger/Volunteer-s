@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Grid } from '@mui/material';
+import { Box, TextField, MenuItem, Button, Grid } from '@mui/material';
 
 function EventFilters({ onFilterChange }) {
   const [country, setCountry] = useState('');
-  const [region, setRegion] = useState(''); // Добавляем состояние для региона
+  const [region, setRegion] = useState('');
   const [city, setCity] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -12,7 +12,7 @@ function EventFilters({ onFilterChange }) {
   const handleFilterChange = () => {
     onFilterChange({
       country,
-      region, // Передаем регион в функцию фильтрации
+      region,
       city,
       fromDate,
       toDate,
@@ -24,46 +24,45 @@ function EventFilters({ onFilterChange }) {
     <Box sx={{ mb: 2 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
-          <FormControl fullWidth>
-            <InputLabel>Страна</InputLabel>
-            <Select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              <MenuItem value="Россия">Россия</MenuItem>
-              <MenuItem value="США">США</MenuItem>
-              <MenuItem value="Канада">Канада</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            label="Страна"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Россия">Россия</MenuItem>
+            <MenuItem value="США">США</MenuItem>
+            <MenuItem value="Канада">Канада</MenuItem>
+          </TextField>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
-          {/* Поле для выбора региона */}
-          <FormControl fullWidth>
-            <InputLabel>Регион</InputLabel>
-            <Select
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-            >
-              <MenuItem value="Центральный федеральный округ">Центральный федеральный округ</MenuItem>
-              <MenuItem value="Приволжский федеральный округ">Приволжский федеральный округ</MenuItem>
-              <MenuItem value="Северо-Западный федеральный округ">Северо-Западный федеральный округ</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            label="Регион"
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Центральный федеральный округ">Центральный федеральный округ</MenuItem>
+            <MenuItem value="Приволжский федеральный округ">Приволжский федеральный округ</MenuItem>
+            <MenuItem value="Северо-Западный федеральный округ">Северо-Западный федеральный округ</MenuItem>
+          </TextField>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
-          <FormControl fullWidth>
-            <InputLabel>Город</InputLabel>
-            <Select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            >
-              <MenuItem value="Москва">Москва</MenuItem>
-              <MenuItem value="Нью-Йорк">Нью-Йорк</MenuItem>
-              <MenuItem value="Торонто">Торонто</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            label="Город"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Москва">Москва</MenuItem>
+            <MenuItem value="Нью-Йорк">Нью-Йорк</MenuItem>
+            <MenuItem value="Торонто">Торонто</MenuItem>
+          </TextField>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
@@ -93,20 +92,19 @@ function EventFilters({ onFilterChange }) {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
-          <FormControl fullWidth>
-            <InputLabel>Категория</InputLabel>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <MenuItem value="Спорт">Спорт</MenuItem>
-              <MenuItem value="Культура">Культура</MenuItem>
-              <MenuItem value="Наука">Наука</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            label="Категория"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Спорт">Спорт</MenuItem>
+            <MenuItem value="Культура">Культура</MenuItem>
+            <MenuItem value="Наука">Наука</MenuItem>
+          </TextField>
         </Grid>
 
-        {/* Контейнер для центрирования кнопки */}
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', justifyContent: 'center'}}>
             <Button

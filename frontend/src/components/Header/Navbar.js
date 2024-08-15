@@ -23,7 +23,7 @@ const Navbar = () => {
     <AppBar position="static" className="nav-wrapper">
       <Toolbar>
         <Link to="/" className="brand-logo">
-          <img src={logoImage} alt="Logo" style={{ height: '64px' }} />
+          <img src={logoImage} alt="Logo" style={{ height: '56px' }} />
         </Link>
         <Typography variant="h6" className="brand-name">
           Волонтерский портал

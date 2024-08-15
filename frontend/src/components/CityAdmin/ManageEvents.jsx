@@ -80,11 +80,9 @@ const ManageEvents = () => {
         }
       });
   
-      // Получаем обновленный список событий
       const response = await axios.get('http://185.242.118.144:8000/events/');
       setEvents(response.data);
   
-      // Сбрасываем форму
       setNewEvent({
         name: '',
         shortDescription: '',
@@ -121,7 +119,7 @@ const ManageEvents = () => {
     }
   };
   
-
+ 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
         <Grid container spacing={3}>

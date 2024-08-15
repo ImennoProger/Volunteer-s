@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper, Box } from '@mui/material';
+import { TextField, Button, Paper, Box } from '@mui/material';
 
 const CreateAwards = () => {
   const [award, setAward] = useState({
@@ -38,7 +38,7 @@ const CreateAwards = () => {
           type="number"
           value={award.points}
           onChange={handleChange}
-          inputProps={{ min: 0 }}  // Устанавливаем минимальное значение
+          inputProps={{ min: 0 }}  
           sx={{ mb: 2 }}
         />
         <Button variant="contained" color="primary" onClick={handleCreate}>

@@ -1,4 +1,3 @@
-// src/components/CityAdmin/CityAdminAccordion.jsx
 import React from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
