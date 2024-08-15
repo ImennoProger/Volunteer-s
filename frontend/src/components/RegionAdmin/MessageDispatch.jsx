@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 
 const MessageDispatch = () => {
   const handleSend = () => {

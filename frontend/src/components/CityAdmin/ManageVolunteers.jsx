@@ -13,10 +13,9 @@ import {
 } from '@mui/material';
 
 const ManageVolunteers = () => {
-  // Инициализируем состояние для волонтеров
+
   const [volunteers, setVolunteers] = useState([]);
 
-  // Функция для получения всех пользователей с сервера
   const fetchVolunteers = async () => {
     try {
       const token = localStorage.getItem('token'); 

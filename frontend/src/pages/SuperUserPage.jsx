@@ -5,7 +5,7 @@ import SuperUserAccordion from '../components/SuperUser/SuperUserAccordion';
 
 const SuperUserPage = () => {
   return (
-    <Container>
+    <Container sx={{ marginTop: '40px' }}> 
       <Grid container spacing={4}>
         {/* Профиль суперпользователя слева */}
         <Grid item xs={12} md={4}>

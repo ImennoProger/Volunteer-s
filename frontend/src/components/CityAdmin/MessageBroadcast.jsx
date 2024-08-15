@@ -3,7 +3,6 @@ import {
   Box,
   TextField,
   Button,
-  Typography,
   Paper,
 } from '@mui/material';
 
@@ -15,7 +14,7 @@ const MessageBroadcast = () => {
   };
 
   const handleSend = () => {
-    // Logic to send message to all volunteers
+
     console.log('Message sent:', message);
     setMessage('');
   };

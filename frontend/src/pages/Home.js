@@ -8,9 +8,8 @@ import { Container, Grid, Box, CircularProgress } from '@mui/material';
 function GuestPage() {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [loading, setLoading] = useState(true); // Добавляем состояние загрузки
+  const [loading, setLoading] = useState(true);
 
-  // Получение данных с сервера при монтировании компонента
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -26,24 +25,24 @@ function GuestPage() {
           awards: event.rewards,
           startDate: event.start_date,
           endDate: event.end_date,
-          country: event.country_name,  // Обновляем на название
-          city: event.city_name,        // Обновляем на название
-          category: event.category_name,// Обновляем на название
-          imageUrl: 'https://via.placeholder.com/150', // Placeholder image
+          country: event.country_name,  
+          city: event.city_name,        
+          category: event.category_name,
+          imageUrl: 'https://via.placeholder.com/150', 
           latitude: 55.751244, // Тестовые значения, заменить на реальные
           longitude: 37.618423, // Тестовые значения, заменить на реальные
         }));
-        setEvents(eventData); // Устанавливаем полученные события
-        setFilteredEvents(eventData); // Изначально отображаем все события
-        setLoading(false); // Устанавливаем флаг загрузки в false
+        setEvents(eventData); 
+        setFilteredEvents(eventData); 
+        setLoading(false); 
       } catch (error) {
         console.error('Ошибка при получении событий:', error);
-        setLoading(false); // Устанавливаем флаг загрузки в false при ошибке
+        setLoading(false); 
       }
     };
 
     fetchEvents();
-  }, []); // Пустой массив зависимостей для вызова при монтировании компонента
+  }, []);
 
   // Функция фильтрации событий
   const handleFilterChange = (filters) => {
@@ -74,7 +73,7 @@ function GuestPage() {
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ marginTop: '64px' }}>
       <Box sx={{ mb: 2 }}>
         <EventFilters onFilterChange={handleFilterChange} />
       </Box>

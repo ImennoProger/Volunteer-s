@@ -50,6 +50,7 @@ const ManageEvents = () => {
     imageUrl: '',
     startDate: '',
     endDate: '',
+    category: '',
   });
 
   const handleChange = (e) => {
@@ -216,6 +217,14 @@ const ManageEvents = () => {
           value={newEvent.endDate}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Категория"
+          name="category"
+          value={newEvent.category}
+          onChange={handleChange}
           sx={{ mb: 2 }}
         />
         <div>

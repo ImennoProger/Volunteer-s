@@ -1,12 +1,13 @@
 .nav-wrapper {
-  background-color: #c57aed; /* Цвет фона навбара */
-  padding: 0 20px; /* Отступы слева и справа */
+  background-color: rgb(199, 146, 234) !important;
+  padding: 0 10px !important; 
+  min-height: 48px !important;
 }
 
 .brand-logo {
-  height: 64px; /* Высота логотипа */
-  line-height: 64px; /* Выравнивание логотипа по вертикали */
-  font-size: 1.5rem; /* Размер текста логотипа */
+  height: 56px !important; 
+  line-height: 56px !important; 
+  font-size: 1.5rem; 
   text-decoration: none;
   color: inherit;
 }
@@ -14,6 +15,7 @@
 .brand-name {
   flex-grow: 1;
   text-align: center;
+  line-height: 56px !important; 
 }
 
 .nav-buttons {

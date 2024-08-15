@@ -11,6 +11,7 @@ import VolunteerPage from './pages/VolunteerPage';
 import CityAdminPage from './pages/CityAdminPage';
 import RegionAdminPage from './pages/RegionAdminPage';
 import SuperUserPage from './pages/SuperUserPage';
+import EventDetailsPage from './pages/EventDetailsPage';
 
 const App = () => {
   return (
@@ -26,7 +27,8 @@ const App = () => {
           <Route path="/volunteer" element={<VolunteerPage />} />
           <Route path="/city-admin" element={<CityAdminPage />} />
           <Route path="/region-admin" element={<RegionAdminPage />} />
-          <Route path="/superuser" element={<SuperUserPage />} /> 
+          <Route path="/superuser" element={<SuperUserPage />} />
+          <Route path="/event/:id" element={<EventDetailsPage/>} /> 
         </Routes>
       </div>
     </div>

@@ -1,4 +1,3 @@
-// src/components/RegionAdmin/RegionAdminProfile.jsx
 import React, { useState } from 'react';
 import { Avatar, Button, TextField, Typography, Paper, Box } from '@mui/material';
 
@@ -18,7 +17,6 @@ const RegionAdminProfile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Проверка для возраста
     if (name === 'age' && value < 0) return;
 
     setProfile(prevState => ({
@@ -120,7 +118,7 @@ const RegionAdminProfile = () => {
           type="number"
           value={profile.age}
           onChange={handleChange}
-          inputProps={{ min: 0 }}  // Устанавливаем минимальное значение
+          inputProps={{ min: 0 }} 
           sx={{ mb: 2 }}
         />
         <TextField
