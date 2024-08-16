@@ -14,7 +14,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`http://185.242.118.144:8000/events/${id}/`);
+        const response = await axios.get(`http://localhost:8000/events/${id}/`);
         setEvent(response.data);
         setLoading(false);
       } catch (error) {
@@ -68,7 +68,7 @@ function EventDetails() {
           component="img"
           alt={event.event_name}
           height="200"
-          image={event.imageUrl || 'https://via.placeholder.com/500'} 
+          image={event.image || 'https://via.placeholder.com/500'} 
           sx={{ objectFit: 'cover' }}
         />
       </Card>
@@ -76,16 +76,16 @@ function EventDetails() {
       <Typography variant="body1" sx={{ mt: 2 }}>
         <strong>Описание:</strong> {event.full_description}<br />
         <strong>Краткое описание:</strong> {event.short_description}<br />
-        <strong>Дата начала:</strong> {new Date(event.startDate).toLocaleDateString()}<br />
-        <strong>Дата окончания:</strong> {new Date(event.endDate).toLocaleDateString()}<br />
-        <strong>Требуется:</strong> {event.requiredPeople} человек<br />
-        <strong>Зарегистрировано:</strong> {event.registeredPeople} человек<br />
-        <strong>Очки:</strong> {event.points}<br />
-        <strong>Награды:</strong> {event.awards}<br />
-        <strong>Страна:</strong> {event.country}<br />
-        <strong>Город:</strong> {event.city}<br />
+        <strong>Дата начала:</strong> {new Date(event.start_date).toLocaleDateString()}<br />
+        <strong>Дата окончания:</strong> {new Date(event.end_date).toLocaleDateString()}<br />
+        <strong>Требуется:</strong> {event.required_volunteers} человек<br />
+        <strong>Зарегистрировано:</strong> {event.registered_volunteers} человек<br />
+        <strong>Очки:</strong> {event.participation_points}<br />
+        <strong>Награды:</strong> {event.rewards}<br />
+        <strong>Страна:</strong> {event.country_name}<br />
+        <strong>Город:</strong> {event.city_name}<br />
         <strong>Регион:</strong> {event.region}<br />
-        <strong>Категория:</strong> {event.category}
+        <strong>Категория:</strong> {event.category_name}
       </Typography>
       <Box sx={{ mt: 3 }}>
         <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={handleRegister}>

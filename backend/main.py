@@ -143,12 +143,50 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
         rewards=event.rewards,
         user_id=user.user_id,  # Используем user_id из таблицы User
         creation_date=datetime.utcnow(),
-        event_status=True
+        event_status=True,
+        image=event.image,
+        latitude=event.latitude,
+        longitude=event.longitude
     )
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
     return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
+
+@app.get("/events/{event_id}", response_model=EventRead)
+def read_event(event_id: int, db: Session = Depends(get_db)):
+    event = db.query(Event).options(
+        joinedload(Event.country),
+        joinedload(Event.city),
+        joinedload(Event.category)
+    ).filter(Event.event_id == event_id).first()
+    
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    event_details = {
+        "event_id": event.event_id,
+        "event_name": event.event_name,
+        "short_description": event.short_description,
+        "full_description": event.full_description,
+        "start_date": event.start_date,
+        "end_date": event.end_date,
+        "category_name": event.category.category_name if event.category else None,
+        "required_volunteers": event.required_volunteers,
+        "participation_points": event.participation_points,
+        "rewards": event.rewards,
+        "registered_volunteers": event.registered_volunteers,
+        "country_name": event.country.country_name if event.country else None,
+        "city_name": event.city.city_name if event.city else None,
+        "user_id": event.user_id,
+        "creation_date": event.creation_date,
+        "event_status": event.event_status,
+        "image": event.image,
+        "latitude": event.latitude,
+        "longitude": event.longitude
+    }
+    
+    return event_details
 
 
 @app.get("/events/", response_model=List[EventRead])
@@ -178,7 +216,10 @@ def read_events(db: Session = Depends(get_db)):
             "city_name": event.city.city_name if event.city else None,
             "user_id": event.user_id,
             "creation_date": event.creation_date,
-            "event_status": event.event_status
+            "event_status": event.event_status,
+            "image": event.image,
+            "latitude": event.latitude,
+            "longitude": event.longitude
         }
         events_with_details.append(event_details)
     
@@ -257,7 +298,7 @@ class SendEmailVerify:
     <body>
         <h2>Подтверждение аккаунта</h2>
         <p>Нажмите на кнопку ниже, чтобы подтвердить ваш аккаунт:</p>
-        <a href="http://185.242.118.144:8000/verify-token/{token}" style="
+        <a href="http://localhost:8000/verify-token/{token}" style="
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -356,21 +397,9 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"http://185.242.118.144:3000/protected?token={token}"
+    redirect_url = f"http://localhost:3000/protected?token={token}"
     return RedirectResponse(redirect_url)
     #return {"message": "Token is valid"}
-
-@app.get("/protected")
-async def read_protected_data(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise HTTPException(status_code=403, detail="Token is invalid or expired")
-        
-        return {"message": "Protected data", "status": "success"}
-    except JWTError:
-        raise HTTPException(status_code=403, detail="Token is invalid or expired")
 
 @app.get("/countries/", response_model=list[CountryCreate])
 def read_countries(db: Session = Depends(get_db)):

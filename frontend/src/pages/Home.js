@@ -13,7 +13,7 @@ function GuestPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://185.242.118.144:8000/events/');
+        const response = await axios.get('http://localhost:8000/events/');
         const eventData = response.data.map(event => ({
           id: event.event_id,
           name: event.event_name,
@@ -28,9 +28,9 @@ function GuestPage() {
           country: event.country_name,  
           city: event.city_name,        
           category: event.category_name,
-          imageUrl: 'https://via.placeholder.com/150', 
-          latitude: 55.751244, // Тестовые значения, заменить на реальные
-          longitude: 37.618423, // Тестовые значения, заменить на реальные
+          imageUrl: event.image, 
+          latitude: event.latitude,
+          longitude: event.longitude,
         }));
         setEvents(eventData); 
         setFilteredEvents(eventData); 

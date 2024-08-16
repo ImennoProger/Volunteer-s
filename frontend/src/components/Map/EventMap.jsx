@@ -9,12 +9,32 @@ import { Icon, Style } from 'ol/style';
 import { Feature } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import 'ol/ol.css';
-import customMarkerImage from './marker.png'; 
+import customMarkerImage from './marker.png';
 
 function EventMap({ events }) {
   const mapRef = useRef();
 
   useEffect(() => {
+    console.log('Events received:', events); // Проверка получаемых событий
+
+    const vectorSource = new VectorSource({
+      features: events.map(event => {
+        console.log('Event coordinates:', event.longitude, event.latitude); // Проверка координат
+        const feature = new Feature({
+          geometry: new Point(fromLonLat([event.longitude, event.latitude])),
+          name: event.name,
+          description: event.description,
+        });
+        feature.setStyle(new Style({
+          image: new Icon({
+            src: customMarkerImage,
+            scale: 0.1, // Проверьте, чтобы масштаб не был слишком маленьким
+          }),
+        }));
+        return feature;
+      }),
+    });
+
     const map = new Map({
       target: mapRef.current,
       layers: [
@@ -22,26 +42,11 @@ function EventMap({ events }) {
           source: new OSM(),
         }),
         new VectorLayer({
-          source: new VectorSource({
-            features: events.map(event => {
-              const feature = new Feature({
-                geometry: new Point(fromLonLat([event.longitude, event.latitude])),
-                name: event.name,
-                description: event.description,
-              });
-              feature.setStyle(new Style({
-                image: new Icon({
-                  src: customMarkerImage,
-                  scale: 0.1,
-                }),
-              }));
-              return feature;
-            }),
-          }),
+          source: vectorSource,
         }),
       ],
       view: new View({
-        center: fromLonLat([37.618423, 55.751244]),
+        center: fromLonLat([104.266711, 52.293212]),
         zoom: 10,
       }),
     });
