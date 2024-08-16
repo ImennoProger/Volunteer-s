@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float
 from sqlalchemy.orm import relationship, declarative_base
 from pydantic import BaseModel
 from datetime import datetime
-
 
 # Создаем экземпляр MetaData
 metadata = MetaData()
@@ -21,6 +20,7 @@ class UserMetadata(Base):
     user_patronymic = Column(String)
     age = Column(String)
     isActive = Column(Boolean, default=False)
+    status = Column(Boolean, default=True)
 
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
@@ -142,10 +142,13 @@ class Event(Base):
     required_volunteers = Column(Integer)
     registered_volunteers = Column(Integer)
     participation_points = Column(Integer)
-    rewards = Column(Integer)
+    rewards = Column(String)
+    image = Column(String)
     user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
     creation_date = Column(Date)
     event_status = Column(Boolean)
+    latitude = Column(Float)
+    longitude = Column(Float)
 
     country = relationship("Country", back_populates="events")
     city = relationship("City", back_populates="events")
@@ -287,13 +290,16 @@ class EventRead(BaseModel):
     category_name: str
     required_volunteers: int
     participation_points: int
-    rewards: int
+    rewards: str
     registered_volunteers: int
     country_name: str
     city_name: str
     user_id: int
+    image: str
     creation_date: datetime
     event_status: bool
+    latitude: float
+    longitude: float
     class Config:
         from_attributes = True
 
@@ -306,4 +312,9 @@ class EventCreate(BaseModel):
     category_name: str
     required_volunteers: int
     participation_points: int
-    rewards: int
+    rewards: str
+    image: str
+    latitude: float
+    longitude: float
+    class Config:
+        from_attributes = True
