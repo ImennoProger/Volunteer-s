@@ -16,7 +16,7 @@ function ProtectedPage() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/protected`, {
+        const response = await fetch(`http://185.242.118.144:8000/protected`, {
           headers: {
             'Authorization': `Bearer ${storedToken}`,
           },
