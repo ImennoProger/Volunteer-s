@@ -14,7 +14,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/events/${id}/`);
+        const response = await axios.get(`http://185.242.118.144:8000/events/${id}/`);
         setEvent(response.data);
         setLoading(false);
       } catch (error) {
