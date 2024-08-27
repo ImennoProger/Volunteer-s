@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, Box, Snackbar, useMediaQuery, useTheme } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; 
+import { Card, CardContent, CardMedia, Typography, Box, Snackbar, useMediaQuery, useTheme, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import PlaceIcon from '@mui/icons-material/Place';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 function EventCard({ event }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage] = useState('');
 
-  const isLoggedIn = false; // замени на состояние авторизации
   const navigate = useNavigate();
-
-  const handleRegister = () => {
-    if (isLoggedIn) {
-      setSnackbarMessage('Вы записаны на мероприятие');
-      setSnackbarOpen(true);
-    } else {
-      navigate('/login'); 
-    }
-  };
 
   const handleDetails = () => {
     navigate(`/event/${event.id}`);
@@ -28,7 +20,7 @@ function EventCard({ event }) {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return 'Дата не указана';
 
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
     return date.toLocaleDateString('ru-RU', options);
   };
 
@@ -37,36 +29,64 @@ function EventCard({ event }) {
 
   return (
     <>
-      <Card sx={{ maxWidth: isMobile ? '100%' : 345, mb: 3 }}>
+      <Card 
+        sx={{ 
+          maxWidth: isMobile ? '100%' : 345, 
+          mb: 3, 
+          position: 'relative', 
+          overflow: 'hidden',
+          '&:hover': { cursor: 'pointer' }
+        }}
+        onClick={handleDetails}
+      >
         <CardMedia
           component="img"
           alt={event.name}
-          height={isMobile ? 200 : 140}
           image={event.imageUrl}
-          sx={{ objectFit: 'cover' }}
+          sx={{ 
+            objectFit: 'cover', 
+            aspectRatio: '1 / 1', 
+            transition: 'opacity 0.3s ease-in-out',
+            '&:hover': {
+              opacity: 0.7
+            }
+          }}
         />
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+            color: 'white', 
+            opacity: 0, 
+            transition: 'opacity 0.3s ease-in-out',
+            '&:hover': {
+              opacity: 1
+            }
+          }}
+        >
+          <Typography variant="h6">Подробнее</Typography>
+        </Box>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h6" component="div">
             {event.name}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {event.shortDescription}
-          </Typography>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              <strong>Дата начала:</strong> {formatDate(event.startDate)}<br />
-              <strong>Дата окончания:</strong> {formatDate(event.endDate)}<br />
-              <strong>Требуется:</strong> {event.requiredPeople} человек<br />
-              <strong>Зарегистрировано:</strong> {event.registeredPeople} человек<br />
-              <strong>Очки:</strong> {event.points}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <PlaceIcon sx={{ mr: 1 }} />
+            <Typography variant="body2" color="text.secondary">{event.city}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CalendarTodayIcon sx={{ mr: 1 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+              {formatDate(event.startDate)} - {formatDate(event.endDate)}
             </Typography>
           </Box>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleRegister}>
-            Записаться
-          </Button>
-          <Button variant="outlined" color="primary" sx={{ mt: 2, ml: 1 }} onClick={handleDetails}>
-            Подробнее
-          </Button>
         </CardContent>
       </Card>
 

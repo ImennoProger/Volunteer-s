@@ -95,9 +95,9 @@ const ManageVolunteers = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h5" component="h2" gutterBottom>
-        Управление волонтёрами
+    <Paper elevation={0} sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Управление волонтёрами
       </Typography>
       <TableContainer>
         <Table>

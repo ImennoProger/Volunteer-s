@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Snackbar, Alert, Button } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { Snackbar, Alert } from '@mui/material';
 import './Register.css'; 
 
 function Register() {
@@ -77,7 +77,7 @@ function Register() {
         }, 5000); 
       } else {
         const errorData = await response.json();
-        setError(errorData.detail || 'Authentication failed!');
+        setError(errorData.detail || 'Ошибка при регистрации!');
       }
     } catch (error) {
       setLoading(false);
@@ -194,6 +194,10 @@ function Register() {
             </button>
             {error && <p style={{ color: 'red' }}>{error}</p>}
           </form>
+
+          <div className="login-link">
+            <p>Уже есть аккаунт? <Link to="/login">Войти</Link></p>
+          </div>
         </div>
       </div>
 
@@ -201,12 +205,6 @@ function Register() {
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-        action={
-          <Button color="inherit" onClick={handleCloseSnackbar}>
-            Закрыть
-          </Button>
-        }
       >
         <Alert onClose={handleCloseSnackbar} severity="success">
           {snackbarMessage}

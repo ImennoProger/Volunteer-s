@@ -1,122 +1,134 @@
 import React, { useState } from 'react';
-import { Box, TextField, MenuItem, Button, Grid } from '@mui/material';
+import { Box, TextField, Button, Checkbox, ListItemText, Typography, IconButton } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
+const filterOptions = {
+  country: ["Россия", "США", "Канада"],
+  region: ["Центральный федеральный округ", "Приволжский федеральный округ", "Северо-Западный федеральный округ"],
+  city: ["Москва", "Нью-Йорк", "Торонто"],
+  category: ["Спорт", "Культура", "Наука"],
+};
 
 function EventFilters({ onFilterChange }) {
-  const [country, setCountry] = useState('');
-  const [region, setRegion] = useState('');
-  const [city, setCity] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
-  const [category, setCategory] = useState('');
+  const [filters, setFilters] = useState({
+    country: [],
+    region: [],
+    city: [],
+    category: [],
+  });
+  const [open, setOpen] = useState({
+    country: false,
+    region: false,
+    city: false,
+    category: false,
+  });
+  const [dateRange, setDateRange] = useState({ fromDate: '', toDate: '' });
 
   const handleFilterChange = () => {
     onFilterChange({
-      country,
-      region,
-      city,
-      fromDate,
-      toDate,
-      category,
+      ...filters,
+      ...dateRange,
     });
   };
 
+  const handleSelect = (filterType, value) => () => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: prev[filterType].includes(value)
+        ? prev[filterType].filter(item => item !== value)
+        : [...prev[filterType], value],
+    }));
+  };
+
+  const handleDateChange = (e) => {
+    setDateRange((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   return (
-    <Box sx={{ mb: 2 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            select
-            label="Страна"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            fullWidth
-          >
-            <MenuItem value="Россия">Россия</MenuItem>
-            <MenuItem value="США">США</MenuItem>
-            <MenuItem value="Канада">Канада</MenuItem>
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            select
-            label="Регион"
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            fullWidth
-          >
-            <MenuItem value="Центральный федеральный округ">Центральный федеральный округ</MenuItem>
-            <MenuItem value="Приволжский федеральный округ">Приволжский федеральный округ</MenuItem>
-            <MenuItem value="Северо-Западный федеральный округ">Северо-Западный федеральный округ</MenuItem>
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            select
-            label="Город"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            fullWidth
-          >
-            <MenuItem value="Москва">Москва</MenuItem>
-            <MenuItem value="Нью-Йорк">Нью-Йорк</MenuItem>
-            <MenuItem value="Торонто">Торонто</MenuItem>
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="От"
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
+    <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {Object.keys(filterOptions).map((filterType) => (
+        <Box key={filterType} sx={{ position: 'relative', border: '1px solid #ddd', borderRadius: 1 }}>
+          <Box
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              padding: 1, 
+              cursor: 'pointer', 
+              backgroundColor: '#f5f5f5' 
             }}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="До"
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            select
-            label="Категория"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            fullWidth
+            onClick={() => setOpen((prev) => ({ ...prev, [filterType]: !prev[filterType] }))}
           >
-            <MenuItem value="Спорт">Спорт</MenuItem>
-            <MenuItem value="Культура">Культура</MenuItem>
-            <MenuItem value="Наука">Наука</MenuItem>
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'center'}}>
-            <Button
-              variant="contained"
-              onClick={handleFilterChange}
-              sx={{ width: '50%', maxWidth: 300 }} // Максимальная ширина кнопки
-            >
-              Применить
-            </Button>
+            <Typography variant="body1" flexGrow={1}>
+              {filterType === 'country' ? 'Страна' :
+               filterType === 'region' ? 'Регион' :
+               filterType === 'city' ? 'Город' :
+               filterType === 'category' ? 'Категория' : ''}
+            </Typography>
+            <IconButton>
+              {open[filterType] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
           </Box>
-        </Grid>
-      </Grid>
+          {open[filterType] && (
+            <Box sx={{ 
+              maxHeight: 200, 
+              overflowY: 'auto', 
+              borderTop: '1px solid #ddd', 
+              padding: 1 
+            }}>
+              {filterOptions[filterType].map((item) => (
+                <Box
+                  key={item}
+                  sx={{ display: 'flex', alignItems: 'center', mb: 1, cursor: 'pointer' }}
+                  onClick={handleSelect(filterType, item)}
+                >
+                  <Checkbox
+                    checked={filters[filterType].includes(item)}
+                  />
+                  <ListItemText primary={item} />
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      ))}
+
+      <TextField
+        label="От"
+        type="date"
+        name="fromDate"
+        value={dateRange.fromDate}
+        onChange={handleDateChange}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        fullWidth
+      />
+
+      <TextField
+        label="До"
+        type="date"
+        name="toDate"
+        value={dateRange.toDate}
+        onChange={handleDateChange}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        fullWidth
+      />
+
+      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          onClick={handleFilterChange}
+          sx={{ width: '50%', maxWidth: 300 }}
+        >
+          Применить
+        </Button>
+      </Box>
     </Box>
   );
 }

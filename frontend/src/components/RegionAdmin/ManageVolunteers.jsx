@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
   Button,
+  Typography
 } from '@mui/material';
 
 const ManageVolunteers = () => {
@@ -42,7 +43,10 @@ const ManageVolunteers = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
+    <Paper elevation={0} sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Управление волонтёрами
+      </Typography>
       <TableContainer>
         <Table>
           <TableHead>

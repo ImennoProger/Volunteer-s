@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Paper, Box } from '@mui/material';
+import { TextField, Button, Paper, Box, Typography } from '@mui/material';
 
 const CreateCategories = () => {
   const [category, setCategory] = useState({
@@ -21,6 +21,9 @@ const CreateCategories = () => {
 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Создание категорий
+      </Typography>
       <Box component="form">
         <TextField
           fullWidth

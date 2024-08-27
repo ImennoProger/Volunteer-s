@@ -3,7 +3,7 @@ import axios from 'axios';
 import EventFilters from '../components/Filters/EventFilters';
 import EventMap from '../components/Map/EventMap';
 import EventCard from '../components/EventCards/EventCard';
-import { Container, Grid, Box, CircularProgress } from '@mui/material';
+import { Box, Grid, CircularProgress } from '@mui/material';
 
 function GuestPage() {
   const [events, setEvents] = useState([]);
@@ -49,9 +49,9 @@ function GuestPage() {
     console.log('Filter change:', filters);
 
     const filtered = events.filter((event) => {
-      const matchCountry = filters.country ? event.country === filters.country : true;
-      const matchCity = filters.city ? event.city === filters.city : true;
-      const matchCategory = filters.category ? event.category === filters.category : true;
+      const matchCountry = filters.country.length ? filters.country.includes(event.country) : true;
+      const matchCity = filters.city.length ? filters.city.includes(event.city) : true;
+      const matchCategory = filters.category.length ? filters.category.includes(event.category) : true;
       const matchFromDate = filters.fromDate ? new Date(event.startDate) >= new Date(filters.fromDate) : true;
       const matchToDate = filters.toDate ? new Date(event.endDate) <= new Date(filters.toDate) : true;
 
@@ -66,28 +66,37 @@ function GuestPage() {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ marginTop: '64px' }}>
-      <Box sx={{ mb: 2 }}>
-        <EventFilters onFilterChange={handleFilterChange} />
-      </Box>
-      <Box sx={{ mt: 2 }}>
-        <EventMap events={filteredEvents} />
-      </Box>
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {filteredEvents.map((event) => (
-          <Grid item xs={12} sm={6} md={4} key={event.id}>
-            <EventCard event={event} />
+    <Box sx={{ marginTop: '64px', paddingLeft: 0, paddingRight: 0 }}>
+      <Grid container spacing={2}>
+        {/* Левый столбец с фильтрами */}
+        <Grid item xs={12} sm={4} md={3} sx={{ paddingLeft: 0, paddingRight: 0 }}>
+          <Box sx={{ position: 'sticky', top: '80px', paddingLeft: 0, paddingRight: '16px' }}>
+            <EventFilters onFilterChange={handleFilterChange} />
+          </Box>
+        </Grid>
+        
+        {/* Правый столбец с картой и карточками мероприятий */}
+        <Grid item xs={12} sm={8} md={9} sx={{ paddingLeft: 0, paddingRight: 0 }}>
+          <Box sx={{ mb: 2 }}>
+            <EventMap events={filteredEvents} />
+          </Box>
+          <Grid container spacing={2}>
+            {filteredEvents.map((event) => (
+              <Grid item xs={12} sm={6} md={4} key={event.id}>
+                <EventCard event={event} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
+        </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 }
 
