@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Paper, Box } from '@mui/material';
+import { TextField, Button, Paper, Box, Typography } from '@mui/material';
 
 const CreateAwards = () => {
   const [award, setAward] = useState({
@@ -22,6 +22,9 @@ const CreateAwards = () => {
 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Создание наград
+      </Typography>
       <Box component="form">
         <TextField
           fullWidth

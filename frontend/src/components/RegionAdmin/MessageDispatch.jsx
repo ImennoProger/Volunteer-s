@@ -1,22 +1,47 @@
-import React from 'react';
-import { Box, Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  Paper,
+  Typography,
+} from '@mui/material';
 
 const MessageDispatch = () => {
+  const [message, setMessage] = useState('');
+
+  const handleChange = (e) => {
+    setMessage(e.target.value);
+  };
+
   const handleSend = () => {
-    // Логика для отправки сообщений
-    console.log('Message sent');
+
+    console.log('Message sent:', message);
+    setMessage('');
   };
 
   return (
-    <Box>
-      <Box component="form" sx={{ mb: 2 }}>
-        <TextField fullWidth label="Сообщение" multiline rows={4} sx={{ mb: 2 }} />
+    <Paper elevation={0} sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Рассылка сообщений
+      </Typography>
+      <Box>
+        <TextField
+          fullWidth
+          label="Сообщение"
+          value={message}
+          onChange={handleChange}
+          multiline
+          rows={4}
+          sx={{ mb: 2 }}
+        />
         <Button variant="contained" color="primary" onClick={handleSend}>
-          Отправить
+          Отправить всем
         </Button>
       </Box>
-    </Box>
+    </Paper>
   );
 };
+
 
 export default MessageDispatch;

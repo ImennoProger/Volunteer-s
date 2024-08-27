@@ -4,6 +4,7 @@ import {
   TextField,
   Button,
   Paper,
+  Typography,
 } from '@mui/material';
 
 const MessageBroadcast = () => {
@@ -20,7 +21,10 @@ const MessageBroadcast = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
+    <Paper elevation={0} sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Рассылка сообщений
+      </Typography>
       <Box>
         <TextField
           fullWidth

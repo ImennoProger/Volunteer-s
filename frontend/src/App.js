@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ResetPassword from './components/Auth/ResetPassword';
@@ -28,7 +27,7 @@ const App = () => {
           <Route path="/city-admin" element={<CityAdminPage />} />
           <Route path="/region-admin" element={<RegionAdminPage />} />
           <Route path="/superuser" element={<SuperUserPage />} />
-          <Route path="/event/:id" element={<EventDetailsPage/>} /> 
+          <Route path="/event/:id" element={<EventDetailsPage />} />
         </Routes>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Paper, Box } from '@mui/material';
+import { TextField, Button, Paper, Box, Typography } from '@mui/material';
 
 const CreateRanks = () => {
   const [rank, setRank] = useState({
@@ -22,6 +22,9 @@ const CreateRanks = () => {
 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Создание рангов
+      </Typography>
       <Box component="form">
         <TextField
           fullWidth

@@ -1,7 +1,11 @@
 {
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@mui/icons-material": "^5.16.7",
     "axios": "^1.7.4",
-    "ol": "^10.0.0"
+    "ol": "^10.0.0",
+    "python": "^0.0.4",
+    "react-slick": "^0.30.2",
+    "slick-carousel": "^1.8.1"
   }
 }
