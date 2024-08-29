@@ -19,7 +19,7 @@ const ManageVolunteers = () => {
   const fetchVolunteers = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      const response = await axios.get('http://185.242.118.144:8000/users/', {
+      const response = await axios.get('https://185.242.118.144:8000/users/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -39,7 +39,7 @@ const ManageVolunteers = () => {
   const handleBlock = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://185.242.118.144:8000/users/block/${id}`, {}, {
+      await axios.put(`https://185.242.118.144:8000/users/block/${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -61,7 +61,7 @@ const ManageVolunteers = () => {
   const handleUnblock = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://185.242.118.144:8000/users/unblock/${id}`, {}, {
+      await axios.put(`https://185.242.118.144:8000/users/unblock/${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -82,7 +82,7 @@ const ManageVolunteers = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://185.242.118.144:8000/users/${id}`, {
+      await axios.delete(`https://185.242.118.144:8000/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
