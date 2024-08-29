@@ -37,7 +37,7 @@ const ManageEvents = () => {
    useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://185.242.118.144:8000/events/', {
+        const response = await axios.get('https://185.242.118.144:8000/events/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -71,7 +71,7 @@ const ManageEvents = () => {
   
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://185.242.118.144:8000/events/', {
+      await axios.post('https://185.242.118.144:8000/events/', {
         event_name: newEvent.name,
         short_description: newEvent.shortDescription,
         full_description: newEvent.fullDescription,
@@ -90,7 +90,7 @@ const ManageEvents = () => {
         }
       });
   
-      const response = await axios.get('http://185.242.118.144:8000/events/');
+      const response = await axios.get('https://185.242.118.144:8000/events/');
       setEvents(response.data);
   
       setNewEvent({
@@ -126,7 +126,7 @@ const ManageEvents = () => {
     try {
       const token = localStorage.getItem('token');
 
-      await axios.delete(`http://185.242.118.144:8000/events/${id}`, {
+      await axios.delete(`https://185.242.118.144:8000/events/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -397,7 +397,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"http://185.242.118.144:3000/protected?token={token}"
+    redirect_url = f"https://185.242.118.144:3000/protected?token={token}"
     return RedirectResponse(redirect_url)
     #return {"message": "Token is valid"}
 

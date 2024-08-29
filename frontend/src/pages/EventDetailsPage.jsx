@@ -22,7 +22,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`http://185.242.118.144:8000/events/${id}/`);
+        const response = await axios.get(`https://185.242.118.144:8000/events/${id}/`);
         setEvent(response.data);
         setLoading(false);
       } catch (error) {
@@ -33,7 +33,7 @@ function EventDetails() {
 
     const fetchRecommendedEvents = async () => {
       try {
-        const response = await axios.get(`http://185.242.118.144:8000/events/`);
+        const response = await axios.get(`https://185.242.118.144:8000/events/`);
         const eventData = response.data.map(event => ({
           id: event.event_id,
           name: event.event_name,
