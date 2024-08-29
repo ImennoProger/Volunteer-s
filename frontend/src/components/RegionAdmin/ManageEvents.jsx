@@ -13,32 +13,7 @@ import {
 } from '@mui/material';
 
 const ManageEvents = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      name: 'Концерт в парке',
-      shortDescription: 'Музыкальное мероприятие под открытым небом',
-      fullDescription: 'Полное описание концерта в парке...',
-      requiredPeople: 100,
-      points: 10,
-      awards: 'Билет на следующее мероприятие',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
-      startDate: '2024-08-10',
-      endDate: '2024-08-12',
-    },
-    {
-      id: 2,
-      name: 'Спортивное соревнование',
-      shortDescription: 'Соревнование по бегу на длинные дистанции',
-      fullDescription: 'Полное описание спортивного соревнования...',
-      requiredPeople: 200,
-      points: 15,
-      awards: 'Медаль и грамота',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3HFVnkYFJ_OIogo__Qv58bmhwRqZJcQhOA&s',
-      startDate: '2024-08-15',
-      endDate: '2024-08-20',
-    },
-  ]);
+  const [events, setEvents] = useState([]);
 
   const [newEvent, setNewEvent] = useState({
     name: '',

@@ -13,7 +13,7 @@ function GuestPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://185.242.118.144:8000/events/');
+        const response = await axios.get('http://localhost:8000/events/');
         const eventData = response.data.map(event => ({
           id: event.event_id,
           name: event.event_name,

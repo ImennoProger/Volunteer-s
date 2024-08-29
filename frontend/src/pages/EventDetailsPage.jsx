@@ -6,12 +6,13 @@ import { Box, Typography, Button, CircularProgress, Card, CardMedia, Snackbar } 
 import PlaceIcon from '@mui/icons-material/Place';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EventCard from '../components/EventCards/EventCard';
+import EventMap from '../components/Map/EventMap';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 function EventDetails() {
   const { id } = useParams(); 
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState([]);
   const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -21,7 +22,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`http://185.242.118.144:8000/events/${id}/`);
+        const response = await axios.get(`http://localhost:8000/events/${id}/`);
         setEvent(response.data);
         setLoading(false);
       } catch (error) {
@@ -32,8 +33,27 @@ function EventDetails() {
 
     const fetchRecommendedEvents = async () => {
       try {
-        const response = await axios.get(`http://185.242.118.144:8000/events/`);
-        setRecommendedEvents(response.data);
+        const response = await axios.get(`http://localhost:8000/events/`);
+        const eventData = response.data.map(event => ({
+          id: event.event_id,
+          name: event.event_name,
+          description: event.full_description,
+          shortDescription: event.short_description,
+          requiredPeople: event.required_volunteers,
+          registeredPeople: event.registered_volunteers,
+          points: event.participation_points,
+          awards: event.rewards,
+          startDate: event.start_date,
+          endDate: event.end_date,
+          country: event.country_name,  
+          city: event.city_name,        
+          category: event.category_name,
+          imageUrl: event.image, 
+          latitude: event.latitude,
+          longitude: event.longitude,
+        }));
+        setRecommendedEvents(eventData);
+
       } catch (error) {
         console.error('Ошибка при загрузке рекомендованных событий:', error);
       }
@@ -136,12 +156,12 @@ function EventDetails() {
     <Box sx={{ p: 3, maxWidth: '1200px', margin: 'auto' }}>
       <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
         {/* Левый блок с картинкой и информацией */}
-        <Box sx={{ flex: 1, border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+        <Box sx={{ flex: 1, border: '2px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
           <Card>
             <CardMedia
               component="img"
               alt={event.event_name}
-              height="200"
+              height="300"
               image={event.image || 'https://via.placeholder.com/500'}
               sx={{ objectFit: 'cover' }}
             />
@@ -184,7 +204,15 @@ function EventDetails() {
               </Typography>
             </Box>
           </Box>
-
+          <Box sx={{ mb: 2 }}>
+            <EventMap events={[{
+              id: event.event_id,
+              name: event.event_name,
+              description: event.full_description,
+              latitude: event.latitude,
+              longitude: event.longitude,
+            }]} />
+          </Box>
           <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
             <Typography variant="h6" sx={{ mb: 1 }}>Описание</Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>

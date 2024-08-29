@@ -19,7 +19,7 @@ const ManageVolunteers = () => {
   const fetchVolunteers = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      const response = await axios.get('http://185.242.118.144:8000/users/', {
+      const response = await axios.get('http://localhost:8000/users/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -36,7 +36,7 @@ const ManageVolunteers = () => {
   }, []); // Пустой массив зависимостей означает, что эффект выполнится один раз при монтировании
 
   // Функция для блокировки волонтера
-  /*const handleBlock = async (id) => {
+  const handleBlock = async (id) => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(`http://localhost:8000/users/block/${id}`, {}, {
@@ -48,7 +48,7 @@ const ManageVolunteers = () => {
       setVolunteers((prev) =>
         prev.map((volunteer) =>
           volunteer.user_metadata_id === id
-            ? { ...volunteer, isActive: false }
+            ? { ...volunteer, status: false }
             : volunteer
         )
       );
@@ -70,19 +70,19 @@ const ManageVolunteers = () => {
       setVolunteers((prev) =>
         prev.map((volunteer) =>
           volunteer.user_metadata_id === id
-            ? { ...volunteer, isActive: true }
+            ? { ...volunteer, status: true }
             : volunteer
         )
       );
     } catch (error) {
       console.error('Ошибка при разблокировке волонтера:', error.response?.data || error.message);
     }
-  };*/
+  };
 
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://185.242.118.144:8000/users/${id}`, {
+      await axios.delete(`http://localhost:8000/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -117,26 +117,26 @@ const ManageVolunteers = () => {
                 <TableCell>{volunteer.user_surname}</TableCell>
                 <TableCell>{volunteer.email}</TableCell> 
                 <TableCell>
-                  {volunteer.isActive ? 'Активный' : 'Заблокирован'}
+                  {volunteer.status ? 'Заблокирован' : 'Активный'}
                 </TableCell>
                 <TableCell>
-                  {volunteer.isActive ? (
+                  {volunteer.status ? (
                     <Button
-                      variant="outlined"
-                      color="secondary"
-                      //onClick={() => handleBlock(volunteer.user_id)}
-                      sx={{ mr: 1 }}
-                    >
-                      Заблокировать
-                    </Button>
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => handleUnblock(volunteer.user_metadata_id)}
+                    sx={{ mr: 1 }}
+                  >
+                    Разблокировать
+                  </Button>
                   ) : (
                     <Button
                       variant="outlined"
-                      color="primary"
-                      //onClick={() => handleUnblock(volunteer.user_id)}
+                      color="secondary"
+                      onClick={() => handleBlock(volunteer.user_metadata_id)}
                       sx={{ mr: 1 }}
                     >
-                      Разблокировать
+                      Заблокировать
                     </Button>
                   )}
                   <Button
