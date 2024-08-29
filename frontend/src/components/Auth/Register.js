@@ -22,7 +22,7 @@ function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8000/countries/')  // Полный URL-адрес
+    fetch('http://185.242.118.144:8000/countries/')  // Полный URL-адрес
       .then(response => {
         if (!response.ok) {
           throw new Error('Ошибка HTTP ' + response.status);
@@ -39,7 +39,7 @@ function Register() {
     setCity(''); // Сбрасываем выбранный город при изменении страны
 
     // Загрузка списка городов для выбранной страны
-    fetch(`http://localhost:8000/cities/${selectedCountry}`)
+    fetch(`http://185.242.118.144:8000/cities/${selectedCountry}`)
       .then(response => response.json())
       .then(data => setCities(data))
       .catch(error => console.error('Ошибка при загрузке городов:', error));
@@ -60,7 +60,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/register', {
+      const response = await fetch('http://185.242.118.144:8000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
