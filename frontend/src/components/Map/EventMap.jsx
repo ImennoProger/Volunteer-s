@@ -15,11 +15,10 @@ function EventMap({ events }) {
   const mapRef = useRef();
 
   useEffect(() => {
-    console.log('Events received:', events); // Проверка получаемых событий
+    console.log('Events received:', events); 
 
     const vectorSource = new VectorSource({
       features: events.map(event => {
-        console.log('Event coordinates:', event.longitude, event.latitude); // Проверка координат
         const feature = new Feature({
           geometry: new Point(fromLonLat([event.longitude, event.latitude])),
           name: event.name,
@@ -28,12 +27,14 @@ function EventMap({ events }) {
         feature.setStyle(new Style({
           image: new Icon({
             src: customMarkerImage,
-            scale: 0.1, // Проверьте, чтобы масштаб не был слишком маленьким
+            scale: 0.1,
           }),
         }));
         return feature;
       }),
     });
+    
+
 
     const map = new Map({
       target: mapRef.current,

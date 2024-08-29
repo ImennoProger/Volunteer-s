@@ -66,8 +66,8 @@ def block_user(user_metadata_id: int, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     
-    #user.isActive = False вместо isActive нужно добавить поле isBanned
-    #db.commit()
+    user.status = False
+    db.commit()
 
     return {"message": "Пользователь заблокирован"}
 
@@ -77,8 +77,8 @@ def unblock_user(user_metadata_id: int, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     
-    #user.isActive = True   вместо isActive нужно добавить поле isBanned
-    #db.commit()
+    user.status = True
+    db.commit()
 
     return {"message": "Пользователь разблокирован"}
 
@@ -298,7 +298,7 @@ class SendEmailVerify:
     <body>
         <h2>Подтверждение аккаунта</h2>
         <p>Нажмите на кнопку ниже, чтобы подтвердить ваш аккаунт:</p>
-        <a href="http://185.242.118.144:8000/verify-token/{token}" style="
+        <a href="http://localhost:8000/verify-token/{token}" style="
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -397,7 +397,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"http://185.242.118.144:3000/protected?token={token}"
+    redirect_url = f"http://localhost:3000/protected?token={token}"
     return RedirectResponse(redirect_url)
     #return {"message": "Token is valid"}
 

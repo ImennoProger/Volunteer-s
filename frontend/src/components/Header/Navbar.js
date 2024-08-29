@@ -32,9 +32,9 @@ const Navbar = () => {
   };
 
   const messages = [
-    'Message 1',
-    'Message 2',
-    'Message 3',
+    'Сообщение 1',
+    'Сообщение 2',
+    'Сообщение 3',
   ];
 
   return (
@@ -44,7 +44,7 @@ const Navbar = () => {
           <img src={logoImage} alt="Logo" style={{ height: '56px' }} />
         </Link>
         <Typography variant="h6" className="brand-name">
-          Волонтерский портал
+          Волонтёрский портал
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Tooltip title="Баланс">
