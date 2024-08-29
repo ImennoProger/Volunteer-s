@@ -30,7 +30,7 @@ function Login() {
     formDetails.append('password', password);
 
     try {
-      const response = await fetch('https://185.242.118.144:8000/token', {
+      const response = await fetch('https://volunteers-portal.ru:8000/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
