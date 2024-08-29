@@ -298,7 +298,7 @@ class SendEmailVerify:
     <body>
         <h2>Подтверждение аккаунта</h2>
         <p>Нажмите на кнопку ниже, чтобы подтвердить ваш аккаунт:</p>
-        <a href="http://185.242.118.144:8000/verify-token/{token}" style="
+        <a href="https://volunteers-portal.ru:8000/verify-token/{token}" style="
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -397,7 +397,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"https://185.242.118.144:3000/protected?token={token}"
+    redirect_url = f"https://volunteers-portal.ru:3000/protected?token={token}"
     return RedirectResponse(redirect_url)
     #return {"message": "Token is valid"}
 
