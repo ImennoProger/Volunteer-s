@@ -1,213 +1,280 @@
-import React, { useState } from 'react';
-import { Avatar, Button, TextField, Typography, Paper, Box, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import vkLogo from '../../images/vk-logo.png';
 
-const countries = ['Россия', 'США'];
-const cities = {
-  Россия: ['Москва', 'Санкт-Петербург', 'Новосибирск'],
-  США: ['Нью-Йорк', 'Лос-Анджелес', 'Чикаго'],
-};
+// Импортируем изображение из папки /image
+import avatarImage from '../../images/your-avatar-image.gif'; // Замените "your-avatar-image.gif" на ваше изображение
 
-const CityAdminProfile = () => {
+import '../../pages/globalStyless.css';
+
+const VolunteerProfile = () => {
   const [profile, setProfile] = useState({
-    photo: '',
-    email: 'example@example.com',
-    password: 'password123',
-    surname: 'Иванов',
-    name: 'Иван',
-    patronymic: 'Иванович',
-    age: '30',
-    country: 'Россия',
-    city: 'Москва',
+    photo: avatarImage,  // Устанавливаем путь к аватарке
+    firstName: 'Имя',
+    lastName: 'Фамилия',
+    phoneNumber: '+7 950 942 49 11',
+    email: 'Почта.чипс@mail.ru',
+    city: 'Иркутск',
+    state: 'WA',
+    postcode: '31005',
+    country: 'United States',
   });
 
+  const [activeTab, setActiveTab] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(profile.country);
-  const [selectedCity, setSelectedCity] = useState(profile.city);
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const handleChange = (e) => {
+  const editButtonRef = useRef(null);
+  const saveButtonRef = useRef(null);
+  const cancelButtonRef = useRef(null);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === 'age' && value < 0) return;
-
     setProfile(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  };
-
-  const handleCountryChange = (e) => {
-    const newCountry = e.target.value;
-    setSelectedCountry(newCountry);
-    setSelectedCity(cities[newCountry][0]);
-    setProfile(prevState => ({
-      ...prevState,
-      country: newCountry,
-      city: cities[newCountry][0]
-    }));
-  };
-
-  const handleCityChange = (e) => {
-    const newCity = e.target.value;
-    setSelectedCity(newCity);
-    setProfile(prevState => ({
-      ...prevState,
-      city: newCity
-    }));
-  };
-
-  const handlePhotoChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfile({ ...profile, photo: e.target.result });
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    }
   };
 
   const handleSave = () => {
     setIsEditing(false);
     console.log('Profile saved:', profile);
+    if (saveButtonRef.current) {
+      saveButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    if (editButtonRef.current) {
+      editButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    if (cancelButtonRef.current) {
+      cancelButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
+    }
   };
 
   const handleDeleteAccount = () => {
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setOpenDialog(false);
+    // Логика удаления аккаунта
     console.log('Account deleted');
   };
 
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
+  };
+
+  const preventDefaultFocus = (e) => e.preventDefault();
+
+  const handleLogoClick = (platform) => {
+    switch (platform) {
+      case 'vk':
+        window.open('https://vk.com', '_blank');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <Paper elevation={0} sx={{ p: 2 }}>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-        Настройки профиля
-      </Typography>
-      <Avatar src={profile.photo} sx={{ width: 100, height: 100, mb: 2 }} />
-      <Box component="form">
-        <Button variant="contained" component="label" sx={{ mb: 2 }}>
-          Загрузить фото
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={handlePhotoChange}
-          />
-        </Button>
-        {profile.photo && (
-          <Box sx={{ mb: 2 }}>
-            <img
-              src={profile.photo}
-              alt="Profile"
-              style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '50%' }}
-            />
-          </Box>
-        )}
-        {/* Поля ввода или текст */}
-        {!isEditing ? (
-          <>
-            <Typography variant="body1" sx={{ mb: 2 }}>Email: {profile.email}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Фамилия: {profile.surname}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Имя: {profile.name}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Отчество: {profile.patronymic}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Возраст: {profile.age}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Страна: {profile.country}</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>Город: {profile.city}</Typography>
-          </>
-        ) : (
-          <>
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              value={profile.email}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Фамилия"
-              name="surname"
-              value={profile.surname}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Имя"
-              name="name"
-              value={profile.name}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Отчество"
-              name="patronymic"
-              value={profile.patronymic}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Возраст"
-              name="age"
-              type="number"
-              value={profile.age}
-              onChange={handleChange}
-              inputProps={{ min: 0 }}
-              sx={{ mb: 2 }}
-            />
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Страна</InputLabel>
-              <Select
-                value={selectedCountry}
-                onChange={handleCountryChange}
-                label="Страна"
-              >
-                {countries.map((country) => (
-                  <MenuItem key={country} value={country}>
-                    {country}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Город</InputLabel>
-              <Select
-                value={selectedCity}
-                onChange={handleCityChange}
-                label="Город"
-              >
-                {cities[selectedCountry]?.map((city) => (
-                  <MenuItem key={city} value={city}>
-                    {city}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </>
-        )}
-        <Box sx={{ mt: 2 }}>
-          {!isEditing ? (
-            <Button variant="contained" color="primary" onClick={() => setIsEditing(true)}>
-              Редактировать
-            </Button>
-          ) : (
-            <>
-              <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 2 }}>
-                Сохранить
-              </Button>
-              <Button variant="outlined" color="secondary" onClick={() => setIsEditing(false)}>
-                Отмена
-              </Button>
-            </>
-          )}
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Button variant="outlined" color="error" onClick={handleDeleteAccount}>
-            Удалить аккаунт
-          </Button>
+    <Box sx={{ display: 'flex', p: 2 }}>
+      {/* Боковая панель */}
+      <Box sx={{ width: '25%', p: 2, backgroundColor: '#f5f5f5', textAlign: 'center' }}>
+        {/* Аватарка, размещенная по центру и увеличенного размера */}
+        <Avatar
+          src={profile.photo}
+          sx={{
+            width: 150,  // Увеличенный размер аватарки
+            height: 150, // Увеличенный размер аватарки
+            mb: 2,
+            margin: '0 auto',  // Центрирование аватарки
+            '& img': {
+              objectFit: 'cover', // Обеспечивает правильное отображение анимации
+            },
+          }}
+        />
+        <Typography variant="h6">{`${profile.firstName} ${profile.lastName}`}</Typography>
+        <Typography variant="body2">Ранг</Typography>
+
+        {/* Убраны строки с информацией о возможностях */}
+        
+        {/* Статистика и логотипы */}
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <Typography variant="body1">Достижений</Typography>
+            <Typography variant="h6">2</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1">Баллов</Typography>
+            <Typography variant="h6">1234</Typography>
+          </Grid>
+        </Grid>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+          <Box component="img" src={vkLogo} alt="VK" sx={{ cursor: 'pointer', width: 50 }} onClick={() => handleLogoClick('vk')} />
         </Box>
       </Box>
-    </Paper>
+
+      {/* Основная секция */}
+      <Box sx={{ width: '75%', p: 2 }}>
+        <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
+          <Tab 
+            label="Профиль"
+            onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+          />
+          <Tab 
+            label="Достижения"
+            onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+          />
+        </Tabs>
+
+        {activeTab === 0 && (
+          <Box component="form">
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Имя"
+                  name="firstName"
+                  value={profile.firstName}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Фамилия"
+                  name="lastName"
+                  value={profile.lastName}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Номер телефона"
+                  name="phoneNumber"
+                  value={profile.phoneNumber}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={profile.email}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Город"
+                  name="city"
+                  value={profile.city}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Страна"
+                  name="country"
+                  value={profile.country}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                />
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+              {!isEditing ? (
+                <>
+                  <Button
+                    variant="contained"
+                    onClick={handleEditClick}
+                    ref={editButtonRef}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Редактировать
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDeleteAccount}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Удалить аккаунт
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="contained"
+                    onClick={handleSave}
+                    ref={saveButtonRef}
+                    sx={{ mr: 2 }}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Сохранить
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handleCancel}
+                    ref={cancelButtonRef}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Отмена
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Box>
+        )}
+
+        {activeTab === 1 && (
+          <Box>
+            <Typography variant="h6">Достижения</Typography>
+            <Typography variant="body2">Здесь будет отображаться список достижений пользователя.</Typography>
+          </Box>
+        )}
+      </Box>
+
+      {/* Диалоговое окно подтверждения удаления аккаунта */}
+      <Dialog
+        open={openDialog}
+        onClose={handleCancelDelete}
+      >
+        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Отмена</Button>
+          <Button onClick={handleConfirmDelete} color="error">Удалить</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
-export default CityAdminProfile;
+export default VolunteerProfile;

@@ -6,12 +6,13 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import EventIcon from '@mui/icons-material/Event';
 import GroupIcon from '@mui/icons-material/Group';
 import PeopleIcon from '@mui/icons-material/People';
+import '../pages/globalStyless.css';
 
 import VolunteerProfile from '../components/Volunteer/VolunteerProfile';
 import Friends from '../components/Volunteer/Friends';
 import Groups from '../components/Volunteer/Groups';
 import VolunteerAchievements from '../components/Volunteer/VolunteerAchievements';
-import VolunteerEvents from '../components/Volunteer/VolunteerEvents';
+import VolunteerEvents from '../components/Volunteer/VolunteerEvents'
 
 const friends = [{ id: 1, name: 'Friend 1' }];
 const groups = [{ id: 1, name: 'Group 1' }];
@@ -42,6 +43,8 @@ const VolunteerPage = () => {
         return <VolunteerProfile />;
     }
   };
+
+  const preventDefaultFocus = (e) => e.preventDefault();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -96,19 +99,49 @@ const VolunteerPage = () => {
             Волонтёр
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Button variant="contained" onClick={() => setSelectedSection('profile')} sx={{ mb: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setSelectedSection('profile')}
+              sx={{ mb: 1 }}
+              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+              className="left-column-button"
+            >
               Настройки профиля
             </Button>
-            <Button variant="contained" onClick={() => setSelectedSection('achievements')} sx={{ mb: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setSelectedSection('achievements')}
+              sx={{ mb: 1 }}
+              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+              className="left-column-button"
+            >
               Достижения
             </Button>
-            <Button variant="contained" onClick={() => setSelectedSection('events')} sx={{ mb: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setSelectedSection('events')}
+              sx={{ mb: 1 }}
+              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+              className="left-column-button"
+            >
               Мероприятия на карте
             </Button>
-            <Button variant="contained" onClick={() => setSelectedSection('friends')} sx={{ mb: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setSelectedSection('friends')}
+              sx={{ mb: 1 }}
+              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+              className="left-column-button"
+            >
               Друзья
             </Button>
-            <Button variant="contained" onClick={() => setSelectedSection('groups')} sx={{ mb: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setSelectedSection('groups')}
+              sx={{ mb: 1 }}
+              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+              className="left-column-button"
+            >
               Группы
             </Button>
           </Box>

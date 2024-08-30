@@ -21,7 +21,7 @@ import os
 
 load_dotenv()
 
-apiBaseUrl = os.getenv('REACT_APP_API_BASE_URL');
+apiBaseUrl = os.getenv('REACT_APP_API_BASE_URL')
 
 app = FastAPI()
 
@@ -319,7 +319,7 @@ class SendEmailVerify:
     </html>
     """
     context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-    # Создание сообщения
+
     msg = EmailMessage()
     msg['Subject'] = "Подтверждение email"
     msg['From'] = email_address
