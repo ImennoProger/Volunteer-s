@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 function ProtectedPage() {
   const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ function ProtectedPage() {
       }
 
       try {
-        const response = await fetch(`https://volunteers-portal.ru:8000/protected`, {
+        const response = await fetch(`${apiBaseUrl}/protected`, {
           headers: {
             'Authorization': `Bearer ${storedToken}`,
           },

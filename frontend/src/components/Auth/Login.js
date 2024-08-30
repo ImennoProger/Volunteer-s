@@ -2,12 +2,16 @@ import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { useAuth } from './AuthContext';
+
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Login() {
   const [username, setUsername] = useState(''); //username - email
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const navigate = useNavigate();
 
@@ -30,7 +34,7 @@ function Login() {
     formDetails.append('password', password);
 
     try {
-      const response = await fetch('https://volunteers-portal.ru:8000/token', {
+      const response = await fetch(`${apiBaseUrl}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -43,7 +47,7 @@ function Login() {
       if (response.ok) {
 
         const data = await response.json();
-        localStorage.setItem('token', data.access_token);
+        login(data.access_token);
         navigate('/');
       } else {
         const errorData = await response.json();

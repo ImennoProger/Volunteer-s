@@ -12,6 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const ManageVolunteers = () => {
 
   const [volunteers, setVolunteers] = useState([]);
@@ -19,7 +21,7 @@ const ManageVolunteers = () => {
   const fetchVolunteers = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      const response = await axios.get('https://volunteers-portal.ru:8000/users/', {
+      const response = await axios.get(`${apiBaseUrl}/users/`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -39,7 +41,7 @@ const ManageVolunteers = () => {
   const handleBlock = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://volunteers-portal.ru:8000/users/block/${id}`, {}, {
+      await axios.put(`${apiBaseUrl}/users/block/${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -61,7 +63,7 @@ const ManageVolunteers = () => {
   const handleUnblock = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://volunteers-portal.ru:8000/users/unblock/${id}`, {}, {
+      await axios.put(`${apiBaseUrl}/users/unblock/${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -82,7 +84,7 @@ const ManageVolunteers = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://volunteers-portal.ru:8000/users/${id}`, {
+      await axios.delete(`${apiBaseUrl}/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

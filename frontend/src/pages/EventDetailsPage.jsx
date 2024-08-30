@@ -10,6 +10,8 @@ import EventMap from '../components/Map/EventMap';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 function EventDetails() {
   const { id } = useParams(); 
   const [event, setEvent] = useState([]);
@@ -22,7 +24,7 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`https://volunteers-portal.ru:8000/events/${id}/`);
+        const response = await axios.get(`${apiBaseUrl}/events/${id}/`);
         setEvent(response.data);
         setLoading(false);
       } catch (error) {
@@ -33,7 +35,7 @@ function EventDetails() {
 
     const fetchRecommendedEvents = async () => {
       try {
-        const response = await axios.get(`https://volunteers-portal.ru:8000/events/`);
+        const response = await axios.get(`${apiBaseUrl}/events/`);
         const eventData = response.data.map(event => ({
           id: event.event_id,
           name: event.event_name,
