@@ -1,0 +1,9 @@
+/* Убираем обводку и тень при фокусе и нажатии для всех кнопок */
+button:focus, button:active {
+    outline: none;
+    box-shadow: none;
+  }
+  .left-column-button:focus, .left-column-button:active {
+    outline: none;
+    box-shadow: none;
+  }
