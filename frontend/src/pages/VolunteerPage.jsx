@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { Box, Button, Paper, Typography, IconButton, Drawer, BottomNavigation, BottomNavigationAction, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Paper, Typography, IconButton, Drawer, List, ListItemText, useMediaQuery, useTheme, BottomNavigation } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import EventIcon from '@mui/icons-material/Event';
 import GroupIcon from '@mui/icons-material/Group';
 import PeopleIcon from '@mui/icons-material/People';
-import '../pages/globalStyless.css';
 
+import { StyledBottomNavigationAction, StyledListItem, StyledListItemIcon } from './UsersPage';
 import VolunteerProfile from '../components/Volunteer/VolunteerProfile';
 import Friends from '../components/Volunteer/Friends';
 import Groups from '../components/Volunteer/Groups';
 import VolunteerAchievements from '../components/Volunteer/VolunteerAchievements';
-import VolunteerEvents from '../components/Volunteer/VolunteerEvents'
+import VolunteerEvents from '../components/Volunteer/VolunteerEvents';
 
 const friends = [{ id: 1, name: 'Friend 1' }];
 const groups = [{ id: 1, name: 'Group 1' }];
@@ -44,10 +44,16 @@ const VolunteerPage = () => {
     }
   };
 
-  const preventDefaultFocus = (e) => e.preventDefault();
+  const handleSectionChange = (newSection) => {
+    setSelectedSection(newSection);
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
           <IconButton
@@ -72,80 +78,97 @@ const VolunteerPage = () => {
                 boxSizing: 'border-box',
                 border: 'none',
                 height: 'auto',
-                width: '100%', 
+                width: '100%',
               },
             }}
           >
             <BottomNavigation
               showLabels
               value={selectedSection}
-              onChange={(event, newValue) => {
-                setSelectedSection(newValue);
-                setIsDrawerOpen(false);
-              }}
-              sx={{ width: '100%' }} 
+              onChange={(event, newValue) => handleSectionChange(newValue)}
+              sx={{ width: '100%' }}
             >
-              <BottomNavigationAction label="Профиль" value="profile" icon={<AccountCircleIcon />} />
-              <BottomNavigationAction label="Достижения" value="achievements" icon={<EmojiEventsIcon />} />
-              <BottomNavigationAction label="Мероприятия" value="events" icon={<EventIcon />} />
-              <BottomNavigationAction label="Друзья" value="friends" icon={<PeopleIcon />} />
-              <BottomNavigationAction label="Группы" value="groups" icon={<GroupIcon />} />
+              <StyledBottomNavigationAction
+                label="Профиль"
+                value="profile"
+                icon={<AccountCircleIcon />}
+              />
+              <StyledBottomNavigationAction
+                label="Достижения"
+                value="achievements"
+                icon={<EmojiEventsIcon />}
+              />
+              <StyledBottomNavigationAction
+                label="Мероприятия"
+                value="events"
+                icon={<EventIcon />}
+              />
+              <StyledBottomNavigationAction
+                label="Друзья"
+                value="friends"
+                icon={<PeopleIcon />}
+              />
+              <StyledBottomNavigationAction
+                label="Группы"
+                value="groups"
+                icon={<GroupIcon />}
+              />
             </BottomNavigation>
           </Drawer>
         </>
       ) : (
-        <Box sx={{ width: '300px', p: 4, color: 'white', position: 'fixed', top: 65, left: 0, height: '100vh' }}>
-          <Typography variant="h5" gutterBottom sx={{ mb: 3, fontWeight: 'bold', color: 'black' }}>
-            Волонтёр
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Button
-              variant="contained"
-              onClick={() => setSelectedSection('profile')}
-              sx={{ mb: 1 }}
-              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-              className="left-column-button"
-            >
-              Настройки профиля
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setSelectedSection('achievements')}
-              sx={{ mb: 1 }}
-              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-              className="left-column-button"
-            >
-              Достижения
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setSelectedSection('events')}
-              sx={{ mb: 1 }}
-              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-              className="left-column-button"
-            >
-              Мероприятия на карте
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setSelectedSection('friends')}
-              sx={{ mb: 1 }}
-              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-              className="left-column-button"
-            >
-              Друзья
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => setSelectedSection('groups')}
-              sx={{ mb: 1 }}
-              onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-              className="left-column-button"
-            >
-              Группы
-            </Button>
-          </Box>
-        </Box>
+        // Навигационная панель для больших экранов
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: 300,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: {
+              width: 300,
+              boxSizing: 'border-box',
+              border: 'none',
+              marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
+              backgroundColor: 'rgba(255, 255, 255, 0.00001)',
+              borderRight: '2px solid #ccc', // Добавление вертикальной линии
+            },
+          }}
+        >
+          <List>
+            <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
+              Волонтёр
+            </Typography>
+            <StyledListItem button onClick={() => handleSectionChange('profile')}>
+              <StyledListItemIcon>
+                <AccountCircleIcon />
+              </StyledListItemIcon>
+              <ListItemText primary="Настройки профиля" />
+            </StyledListItem>
+            <StyledListItem button onClick={() => handleSectionChange('achievements')}>
+              <StyledListItemIcon>
+                <EmojiEventsIcon />
+              </StyledListItemIcon>
+              <ListItemText primary="Достижения" />
+            </StyledListItem>
+            <StyledListItem button onClick={() => handleSectionChange('events')}>
+              <StyledListItemIcon>
+                <EventIcon />
+              </StyledListItemIcon>
+              <ListItemText primary="Мероприятия на карте" />
+            </StyledListItem>
+            <StyledListItem button onClick={() => handleSectionChange('friends')}>
+              <StyledListItemIcon>
+                <PeopleIcon />
+              </StyledListItemIcon>
+              <ListItemText primary="Друзья" />
+            </StyledListItem>
+            <StyledListItem button onClick={() => handleSectionChange('groups')}>
+              <StyledListItemIcon>
+                <GroupIcon />
+              </StyledListItemIcon>
+              <ListItemText primary="Группы" />
+            </StyledListItem>
+          </List>
+        </Drawer>
       )}
 
       {/* Контентная область */}
@@ -154,7 +177,7 @@ const VolunteerPage = () => {
           flexGrow: 1,
           ml: isMobile ? 0 : '100px', // Отступ для ПК
           p: 4,
-          overflow: 'auto', 
+          overflow: 'auto',
           width: '100%',
         }}
       >
