@@ -5,6 +5,8 @@ import EventMap from '../components/Map/EventMap';
 import EventCard from '../components/EventCards/EventCard';
 import { Box, Grid, CircularProgress } from '@mui/material';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 function GuestPage() {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -13,7 +15,8 @@ function GuestPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('https://volunteers-portal.ru:8000/events/');
+        console.log('API Base URL:', apiBaseUrl);
+        const response = await axios.get(`${apiBaseUrl}/events/`);
         const eventData = response.data.map(event => ({
           id: event.event_id,
           name: event.event_name,

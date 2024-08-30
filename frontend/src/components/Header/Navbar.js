@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from './logo192.png';
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, useMediaQuery, useTheme, Badge, Box, Tooltip } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, useMediaQuery, useTheme, Badge, Box, Tooltip, Avatar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageIcon from '@mui/icons-material/Message';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import './Navbar.css';
+import { useAuth } from '../Auth/AuthContext';
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const [messageAnchorEl, setMessageAnchorEl] = useState(null);
+  const { isAuthenticated, logout } = useAuth();
   const open = Boolean(anchorEl);
   const openMessages = Boolean(messageAnchorEl);
+  const openProfileMenu = Boolean(profileAnchorEl);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleProfileMenuOpen = (event) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileAnchorEl(null);
+  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -29,6 +41,11 @@ const Navbar = () => {
 
   const handleMessageMenuClose = () => {
     setMessageAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleProfileMenuClose();
   };
 
   const messages = [
@@ -104,6 +121,39 @@ const Navbar = () => {
             ))
           )}
         </Menu>
+
+        {isAuthenticated ? (
+          <>
+            <IconButton
+              color="inherit"
+              onClick={handleProfileMenuOpen}
+              sx={{ ml: 2 }}
+            >
+              <Avatar alt="User Avatar" />
+            </IconButton>
+            <Menu
+              anchorEl={profileAnchorEl}
+              open={openProfileMenu}
+              onClose={handleProfileMenuClose}
+              sx={{ mt: '45px' }}
+            >
+              <MenuItem onClick={handleProfileMenuClose}><Link to="/volunteer" className="menu-link">Настройки профиля</Link></MenuItem>
+              <MenuItem onClick={handleLogout}>Выйти</MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <>
+            <div className="nav-buttons">
+              <Button color="inherit" component={Link} to="/login">
+                Войти
+              </Button>
+              <Button color="inherit" component={Link} to="/register">
+                Зарегистрироваться
+              </Button>
+            </div>
+          </>
+        )}
+
         {isMobile ? (
           <>
             <IconButton
@@ -127,20 +177,16 @@ const Navbar = () => {
               <MenuItem onClick={handleMenuClose}><Link to="/city-admin" className="menu-link">Адм.гор</Link></MenuItem>
               <MenuItem onClick={handleMenuClose}><Link to="/region-admin" className="menu-link">Адм.рег</Link></MenuItem>
               <MenuItem onClick={handleMenuClose}><Link to="/superuser" className="menu-link">SU</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/login" className="menu-link">Войти</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/register" className="menu-link">Зарегистрироваться</Link></MenuItem>
+              {!isAuthenticated && (
+                <>
+                  <MenuItem onClick={handleMenuClose}><Link to="/login" className="menu-link">Войти</Link></MenuItem>
+                  <MenuItem onClick={handleMenuClose}><Link to="/register" className="menu-link">Зарегистрироваться</Link></MenuItem>
+                </>
+              )}
             </Menu>
           </>
         ) : (
           <>
-            <div className="nav-buttons">
-              <Button color="inherit" component={Link} to="/login">
-                Войти
-              </Button>
-              <Button color="inherit" component={Link} to="/register">
-                Зарегистрироваться
-              </Button>
-            </div>
             <div className="nav-menu">
               <Button
                 color="inherit"
@@ -160,6 +206,12 @@ const Navbar = () => {
                 <MenuItem onClick={handleMenuClose}><Link to="/city-admin" className="menu-link">Адм.гор</Link></MenuItem>
                 <MenuItem onClick={handleMenuClose}><Link to="/region-admin" className="menu-link">Адм.рег</Link></MenuItem>
                 <MenuItem onClick={handleMenuClose}><Link to="/superuser" className="menu-link">SU</Link></MenuItem>
+                {!isAuthenticated && (
+                  <>
+                    <MenuItem onClick={handleMenuClose}><Link to="/login" className="menu-link">Войти</Link></MenuItem>
+                    <MenuItem onClick={handleMenuClose}><Link to="/register" className="menu-link">Зарегистрироваться</Link></MenuItem>
+                  </>
+                )}
               </Menu>
             </div>
           </>

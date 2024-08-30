@@ -11,6 +11,7 @@ import CityAdminPage from './pages/CityAdminPage';
 import RegionAdminPage from './pages/RegionAdminPage';
 import SuperUserPage from './pages/SuperUserPage';
 import EventDetailsPage from './pages/EventDetailsPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/region-admin" element={<RegionAdminPage />} />
           <Route path="/superuser" element={<SuperUserPage />} />
           <Route path="/event/:id" element={<EventDetailsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
     </div>

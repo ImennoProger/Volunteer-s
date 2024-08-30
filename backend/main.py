@@ -16,6 +16,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate
 import ssl
 from sqlalchemy.orm import joinedload
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+apiBaseUrl = os.getenv('REACT_APP_API_BASE_URL');
 
 app = FastAPI()
 
@@ -298,7 +304,7 @@ class SendEmailVerify:
     <body>
         <h2>Подтверждение аккаунта</h2>
         <p>Нажмите на кнопку ниже, чтобы подтвердить ваш аккаунт:</p>
-        <a href="https://volunteers-portal.ru:8000/verify-token/{token}" style="
+        <a href="{apiBaseUrl}/verify-token/{token}" style="
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -397,7 +403,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"https://volunteers-portal.ru:3000/protected?token={token}"
+    redirect_url = f"{apiBaseUrl}/protected?token={token}"
     return RedirectResponse(redirect_url)
     #return {"message": "Token is valid"}
 

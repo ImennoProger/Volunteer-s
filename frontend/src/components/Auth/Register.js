@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
-import './Register.css'; 
+import './Register.css';  
+
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Register() {
   const [username, setUsername] = useState(''); // email
@@ -22,7 +24,7 @@ function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://volunteers-portal.ru:8000/countries/')  // Полный URL-адрес
+    fetch(`${apiBaseUrl}/countries/`)  // Полный URL-адрес
       .then(response => {
         if (!response.ok) {
           throw new Error('Ошибка HTTP ' + response.status);
@@ -39,7 +41,7 @@ function Register() {
     setCity(''); // Сбрасываем выбранный город при изменении страны
 
     // Загрузка списка городов для выбранной страны
-    fetch(`https://volunteers-portal.ru:8000/cities/${selectedCountry}`)
+    fetch(`${apiBaseUrl}/cities/${selectedCountry}`)
       .then(response => response.json())
       .then(data => setCities(data))
       .catch(error => console.error('Ошибка при загрузке городов:', error));
@@ -60,7 +62,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://volunteers-portal.ru:8000/register', {
+      const response = await fetch(`${apiBaseUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
