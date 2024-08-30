@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid } from '@mui/material';
+import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import vkLogo from '../../images/vk-logo.png';
 
 // Импортируем изображение из папки /image
@@ -22,6 +22,7 @@ const VolunteerProfile = () => {
 
   const [activeTab, setActiveTab] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const editButtonRef = useRef(null);
   const saveButtonRef = useRef(null);
@@ -59,6 +60,20 @@ const VolunteerProfile = () => {
     if (cancelButtonRef.current) {
       cancelButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
     }
+  };
+
+  const handleDeleteAccount = () => {
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setOpenDialog(false);
+    // Логика удаления аккаунта
+    console.log('Account deleted');
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
   };
 
   const preventDefaultFocus = (e) => e.preventDefault();
@@ -189,16 +204,26 @@ const VolunteerProfile = () => {
                 />
               </Grid>
             </Grid>
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
               {!isEditing ? (
-                <Button
-                  variant="contained"
-                  onClick={handleEditClick}
-                  ref={editButtonRef}
-                  onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-                >
-                  Редактировать
-                </Button>
+                <>
+                  <Button
+                    variant="contained"
+                    onClick={handleEditClick}
+                    ref={editButtonRef}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Редактировать
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDeleteAccount}
+                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                  >
+                    Удалить аккаунт
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button
@@ -231,6 +256,23 @@ const VolunteerProfile = () => {
           </Box>
         )}
       </Box>
+
+      {/* Диалоговое окно подтверждения удаления аккаунта */}
+      <Dialog
+        open={openDialog}
+        onClose={handleCancelDelete}
+      >
+        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Отмена</Button>
+          <Button onClick={handleConfirmDelete} color="error">Удалить</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
