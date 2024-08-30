@@ -11,7 +11,7 @@ import CreateRanks from '../components/SuperUser/CreateRanks';
 import CreateCategories from '../components/SuperUser/CreateCategories';
 import CreateAwards from '../components/SuperUser/CreateAwards';
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const SuperUserPage = () => {
   const [selectedSection, setSelectedSection] = useState('profile');

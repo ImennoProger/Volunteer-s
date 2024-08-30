@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Drawer, List, ListItem, ListItemText, ListItemIcon, Typography, Paper, IconButton, BottomNavigation, BottomNavigationAction, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Drawer, List, ListItemText, Typography, IconButton, BottomNavigation, useMediaQuery, useTheme, Paper } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import GroupIcon from '@mui/icons-material/Group';
@@ -7,13 +7,14 @@ import EventIcon from '@mui/icons-material/Event';
 import MessageIcon from '@mui/icons-material/Message';
 import BarChartIcon from '@mui/icons-material/BarChart';
 
+import { StyledBottomNavigationAction, StyledListItem, StyledListItemIcon } from './UsersPage';
 import CityAdminProfile from '../components/CityAdmin/CityAdminProfile';
 import ManageVolunteers from '../components/CityAdmin/ManageVolunteers';
 import ManageEvents from '../components/CityAdmin/ManageEvents';
 import MessageBroadcast from '../components/CityAdmin/MessageBroadcast';
 import CityStatistics from '../components/CityAdmin/CityStatistics';
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const CityAdminPage = () => {
   const [selectedSection, setSelectedSection] = useState('profile');
@@ -43,7 +44,6 @@ const CityAdminPage = () => {
       {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
-          {/* Кнопка меню для мобильных устройств */}
           <IconButton
             edge="start"
             color="inherit"
@@ -66,35 +66,43 @@ const CityAdminPage = () => {
                 boxSizing: 'border-box',
                 border: 'none',
                 height: 'auto',
-                width: '100%', 
+                width: '100%',
               },
             }}
           >
-            <BottomNavigation showLabels>
-              <BottomNavigationAction
+            <BottomNavigation
+              showLabels
+              value={selectedSection}
+              onChange={(event, newValue) => {
+                setSelectedSection(newValue);
+                if (isMobile) setIsDrawerOpen(false);
+              }}
+              sx={{ width: '100%' }}
+            >
+              <StyledBottomNavigationAction
                 label="Профиль"
+                value="profile"
                 icon={<AccountCircleIcon />}
-                onClick={() => { setSelectedSection('profile'); setIsDrawerOpen(false); }}
               />
-              <BottomNavigationAction
+              <StyledBottomNavigationAction
                 label="Волонтёры"
+                value="volunteers"
                 icon={<GroupIcon />}
-                onClick={() => { setSelectedSection('volunteers'); setIsDrawerOpen(false); }}
               />
-              <BottomNavigationAction
+              <StyledBottomNavigationAction
                 label="Мероприятия"
+                value="events"
                 icon={<EventIcon />}
-                onClick={() => { setSelectedSection('events'); setIsDrawerOpen(false); }}
               />
-              <BottomNavigationAction
+              <StyledBottomNavigationAction
                 label="Сообщения"
+                value="messages"
                 icon={<MessageIcon />}
-                onClick={() => { setSelectedSection('messages'); setIsDrawerOpen(false); }}
               />
-              <BottomNavigationAction
+              <StyledBottomNavigationAction
                 label="Статистика"
+                value="statistics"
                 icon={<BarChartIcon />}
-                onClick={() => { setSelectedSection('statistics'); setIsDrawerOpen(false); }}
               />
             </BottomNavigation>
           </Drawer>
@@ -112,6 +120,7 @@ const CityAdminPage = () => {
               border: 'none',
               marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
               backgroundColor: 'rgba(255, 255, 255, 0.00001)',
+              borderRight: '2px solid #ccc', // Добавление вертикальной линии
             },
           }}
         >
@@ -119,36 +128,36 @@ const CityAdminPage = () => {
             <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
               Администратор города
             </Typography>
-            <ListItem button onClick={() => setSelectedSection('profile')}>
-              <ListItemIcon>
+            <StyledListItem button onClick={() => setSelectedSection('profile')}>
+              <StyledListItemIcon>
                 <AccountCircleIcon />
-              </ListItemIcon>
+              </StyledListItemIcon>
               <ListItemText primary="Настройки профиля" />
-            </ListItem>
-            <ListItem button onClick={() => setSelectedSection('volunteers')}>
-              <ListItemIcon>
+            </StyledListItem>
+            <StyledListItem button onClick={() => setSelectedSection('volunteers')}>
+              <StyledListItemIcon>
                 <GroupIcon />
-              </ListItemIcon>
+              </StyledListItemIcon>
               <ListItemText primary="Управление волонтёрами" />
-            </ListItem>
-            <ListItem button onClick={() => setSelectedSection('events')}>
-              <ListItemIcon>
+            </StyledListItem>
+            <StyledListItem button onClick={() => setSelectedSection('events')}>
+              <StyledListItemIcon>
                 <EventIcon />
-              </ListItemIcon>
+              </StyledListItemIcon>
               <ListItemText primary="Управление мероприятиями" />
-            </ListItem>
-            <ListItem button onClick={() => setSelectedSection('messages')}>
-              <ListItemIcon>
+            </StyledListItem>
+            <StyledListItem button onClick={() => setSelectedSection('messages')}>
+              <StyledListItemIcon>
                 <MessageIcon />
-              </ListItemIcon>
+              </StyledListItemIcon>
               <ListItemText primary="Рассылка сообщений" />
-            </ListItem>
-            <ListItem button onClick={() => setSelectedSection('statistics')}>
-              <ListItemIcon>
+            </StyledListItem>
+            <StyledListItem button onClick={() => setSelectedSection('statistics')}>
+              <StyledListItemIcon>
                 <BarChartIcon />
-              </ListItemIcon>
+              </StyledListItemIcon>
               <ListItemText primary="Статистика по городу" />
-            </ListItem>
+            </StyledListItem>
           </List>
         </Drawer>
       )}
@@ -159,8 +168,8 @@ const CityAdminPage = () => {
           flexGrow: 1,
           ml: isMobile ? 0 : '50px', // Отступ для ПК
           p: 4,
-          overflow: 'auto', 
-          width: '100%', 
+          overflow: 'auto',
+          width: '100%',
         }}
       >
         <Paper elevation={3} sx={{ p: 4 }}>
