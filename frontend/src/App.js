@@ -1,9 +1,11 @@
+// src/App.js
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ResetPassword from './components/Auth/ResetPassword';
 import Navbar from './components/Header/Navbar';
+import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
 import ProtectedPage from './pages/Protected';
 import VolunteerPage from './pages/VolunteerPage';
@@ -12,10 +14,11 @@ import RegionAdminPage from './pages/RegionAdminPage';
 import SuperUserPage from './pages/SuperUserPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { ThemeProvider } from './components/Header/ThemeContext';
 
 const App = () => {
   return (
-    <div>
+    <ThemeProvider>
       <Navbar />
       <div className="container">
         <Routes>
@@ -32,7 +35,8 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
-    </div>
+      <Footer/>
+    </ThemeProvider>
   );
 }
 

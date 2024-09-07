@@ -1,15 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import React, { useState } from 'react';
+import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
 import vkLogo from '../../images/vk-logo.png';
-
-// Импортируем изображение из папки /image
-import avatarImage from '../../images/your-avatar-image.gif'; // Замените "your-avatar-image.gif" на ваше изображение
-
+import avatarImage from '../../images/your-avatar-image.gif';
 import '../../pages/globalStyless.css';
 
 const VolunteerProfile = () => {
   const [profile, setProfile] = useState({
-    photo: avatarImage,  // Устанавливаем путь к аватарке
+    photo: avatarImage,
     firstName: 'Имя',
     lastName: 'Фамилия',
     phoneNumber: '+7 950 942 49 11',
@@ -24,9 +21,8 @@ const VolunteerProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const editButtonRef = useRef(null);
-  const saveButtonRef = useRef(null);
-  const cancelButtonRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -43,23 +39,14 @@ const VolunteerProfile = () => {
   const handleSave = () => {
     setIsEditing(false);
     console.log('Profile saved:', profile);
-    if (saveButtonRef.current) {
-      saveButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
-    }
   };
 
   const handleEditClick = () => {
     setIsEditing(true);
-    if (editButtonRef.current) {
-      editButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
-    }
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    if (cancelButtonRef.current) {
-      cancelButtonRef.current.blur(); // Убираем выделение кнопки после нажатия
-    }
   };
 
   const handleDeleteAccount = () => {
@@ -68,7 +55,6 @@ const VolunteerProfile = () => {
 
   const handleConfirmDelete = () => {
     setOpenDialog(false);
-    // Логика удаления аккаунта
     console.log('Account deleted');
   };
 
@@ -89,61 +75,74 @@ const VolunteerProfile = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', p: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', p: 2 }}>
       {/* Боковая панель */}
-      <Box sx={{ width: '25%', p: 2, backgroundColor: '#f5f5f5', textAlign: 'center' }}>
-        {/* Аватарка, размещенная по центру и увеличенного размера */}
+      <Box
+        sx={{
+          width: isMobile ? '100%' : '25%',
+          p: 2,
+          backgroundColor: 'var(--secondary-bg-color)',  // Переменная для фона
+          textAlign: 'center',
+          color: 'var(--primary-text-color)',  // Цвет текста
+          mb: isMobile ? 2 : 0,
+        }}
+      >
+        {/* Аватарка */}
         <Avatar
           src={profile.photo}
           sx={{
-            width: 150,  // Увеличенный размер аватарки
-            height: 150, // Увеличенный размер аватарки
+            width: isMobile ? 100 : 150,
+            height: isMobile ? 100 : 150,
             mb: 2,
-            margin: '0 auto',  // Центрирование аватарки
-            '& img': {
-              objectFit: 'cover', // Обеспечивает правильное отображение анимации
-            },
+            margin: '0 auto',
+            '& img': { objectFit: 'cover' },
           }}
         />
-        <Typography variant="h6">{`${profile.firstName} ${profile.lastName}`}</Typography>
-        <Typography variant="body2">Ранг</Typography>
+        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: 'var(--primary-text-color)' }}>
+          {`${profile.firstName} ${profile.lastName}`}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'var(--secondary-text-color)' }}>
+          Ранг
+        </Typography>
 
-        {/* Убраны строки с информацией о возможностях */}
-        
-        {/* Статистика и логотипы */}
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid container spacing={2} sx={{ mb: 2, color: 'var(--primary-text-color)' }}>
           <Grid item xs={6}>
-            <Typography variant="body1">Достижений</Typography>
-            <Typography variant="h6">2</Typography>
+            <Typography variant={isMobile ? 'body2' : 'body1'}>Достижений</Typography>
+            <Typography variant={isMobile ? 'h6' : 'h5'}>2</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1">Баллов</Typography>
-            <Typography variant="h6">1234</Typography>
+            <Typography variant={isMobile ? 'body2' : 'body1'}>Баллов</Typography>
+            <Typography variant={isMobile ? 'h6' : 'h5'}>1234</Typography>
           </Grid>
         </Grid>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Box component="img" src={vkLogo} alt="VK" sx={{ cursor: 'pointer', width: 50 }} onClick={() => handleLogoClick('vk')} />
+          <Box
+            component="img"
+            src={vkLogo}
+            alt="VK"
+            sx={{ cursor: 'pointer', width: isMobile ? 30 : 50 }}
+            onClick={() => handleLogoClick('vk')}
+          />
         </Box>
       </Box>
 
       {/* Основная секция */}
-      <Box sx={{ width: '75%', p: 2 }}>
-        <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-          <Tab 
-            label="Профиль"
-            onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-          />
-          <Tab 
-            label="Достижения"
-            onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
-          />
+      <Box sx={{ width: isMobile ? '100%' : '75%', p: 2 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          sx={{ mb: 3 }}
+          variant={isMobile ? 'scrollable' : 'standard'}
+        >
+          <Tab label="Профиль" onMouseDown={preventDefaultFocus} />
+          <Tab label="Достижения" onMouseDown={preventDefaultFocus} />
         </Tabs>
 
         {activeTab === 0 && (
           <Box component="form">
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Имя"
@@ -153,7 +152,7 @@ const VolunteerProfile = () => {
                   disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Фамилия"
@@ -163,7 +162,7 @@ const VolunteerProfile = () => {
                   disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Номер телефона"
@@ -173,7 +172,7 @@ const VolunteerProfile = () => {
                   disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Email"
@@ -183,7 +182,7 @@ const VolunteerProfile = () => {
                   disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Город"
@@ -193,7 +192,7 @@ const VolunteerProfile = () => {
                   disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Страна"
@@ -204,14 +203,14 @@ const VolunteerProfile = () => {
                 />
               </Grid>
             </Grid>
-            <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+
+            <Box sx={{ mt: 2, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
               {!isEditing ? (
                 <>
                   <Button
                     variant="contained"
                     onClick={handleEditClick}
-                    ref={editButtonRef}
-                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                    sx={{ flex: 1, textAlign: 'center' }}
                   >
                     Редактировать
                   </Button>
@@ -219,7 +218,7 @@ const VolunteerProfile = () => {
                     variant="contained"
                     color="error"
                     onClick={handleDeleteAccount}
-                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                    sx={{ flex: 1, textAlign: 'center' }}
                   >
                     Удалить аккаунт
                   </Button>
@@ -229,17 +228,14 @@ const VolunteerProfile = () => {
                   <Button
                     variant="contained"
                     onClick={handleSave}
-                    ref={saveButtonRef}
-                    sx={{ mr: 2 }}
-                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                    sx={{ flex: 1, textAlign: 'center' }}
                   >
                     Сохранить
                   </Button>
                   <Button
                     variant="outlined"
                     onClick={handleCancel}
-                    ref={cancelButtonRef}
-                    onMouseDown={preventDefaultFocus} // Убираем стандартное поведение при нажатии
+                    sx={{ flex: 1, textAlign: 'center' }}
                   >
                     Отмена
                   </Button>
@@ -258,15 +254,10 @@ const VolunteerProfile = () => {
       </Box>
 
       {/* Диалоговое окно подтверждения удаления аккаунта */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCancelDelete}
-      >
+      <Dialog open={openDialog} onClose={handleCancelDelete}>
         <DialogTitle>Подтверждение удаления</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
-            Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.
-          </Typography>
+          <Typography variant="body1">Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Отмена</Button>

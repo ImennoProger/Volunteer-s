@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, TextField, Button, Checkbox, ListItemText, Typography, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { useTheme } from '@mui/material/styles'; // добавляем хук для работы с темой
 
 const filterOptions = {
   country: ["Россия", "США", "Канада"],
@@ -11,6 +12,7 @@ const filterOptions = {
 };
 
 function EventFilters({ onFilterChange }) {
+  const theme = useTheme(); // получаем текущую тему
   const [filters, setFilters] = useState({
     country: [],
     region: [],
@@ -58,7 +60,7 @@ function EventFilters({ onFilterChange }) {
               alignItems: 'center', 
               padding: 1, 
               cursor: 'pointer', 
-              backgroundColor: '#f5f5f5' 
+              backgroundColor: theme.palette.background.paper // здесь задаём фон в зависимости от темы
             }}
             onClick={() => setOpen((prev) => ({ ...prev, [filterType]: !prev[filterType] }))}
           >
@@ -77,7 +79,8 @@ function EventFilters({ onFilterChange }) {
               maxHeight: 200, 
               overflowY: 'auto', 
               borderTop: '1px solid #ddd', 
-              padding: 1 
+              padding: 1,
+              backgroundColor: theme.palette.background.default // цвет фона списка
             }}>
               {filterOptions[filterType].map((item) => (
                 <Box
@@ -106,6 +109,10 @@ function EventFilters({ onFilterChange }) {
           shrink: true,
         }}
         fullWidth
+        sx={{ 
+          backgroundColor: theme.palette.background.paper, // цвет фона поля ввода
+          color: theme.palette.text.primary // цвет текста в зависимости от темы
+        }}
       />
 
       <TextField
@@ -118,6 +125,10 @@ function EventFilters({ onFilterChange }) {
           shrink: true,
         }}
         fullWidth
+        sx={{ 
+          backgroundColor: theme.palette.background.paper, 
+          color: theme.palette.text.primary 
+        }}
       />
 
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
