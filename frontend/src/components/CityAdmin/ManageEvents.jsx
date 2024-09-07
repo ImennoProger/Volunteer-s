@@ -131,7 +131,7 @@ const ManageEvents = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      // Обновление состояние после успешного удаления
+      // Обновление состояния после успешного удаления
       setEvents((prev) => prev.filter((event) => event.event_id !== id));
     } catch (error) {
       console.error('Ошибка при удалении мероприятия:', error.response?.data || error.message);
@@ -140,10 +140,22 @@ const ManageEvents = () => {
 
   return (
     <Paper elevation={0} sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+      Управление мероприятиями
+      </Typography>
       <Grid container spacing={3}>
         {/* Колонка для создания мероприятия */}
         <Grid item xs={12} md={4}>
-          <Box component="form" onSubmit={handleCreateEvent} sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px'}}>
+          <Box
+            component="form"
+            onSubmit={handleCreateEvent}
+            sx={{
+              p: 2,
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              width: '100%' // Убедитесь, что контейнер занимает всю доступную ширину
+            }}
+          >
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
               Создать новое мероприятие
             </Typography>
@@ -229,28 +241,30 @@ const ManageEvents = () => {
               onChange={handleChange}
               sx={{ mb: 2 }}
             />
-            <div>
+            <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle1">Выберите местоположение на карте:</Typography>
               <EventMapCreate setCoordinates={handleCoordinatesChange} />
-            </div>
+            </Box>
             {imagePreview && (
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle1">Предварительный просмотр:</Typography>
-                <img src={imagePreview} alt="Предварительный просмотр" style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }} />
+                <img
+                  src={imagePreview}
+                  alt="Предварительный просмотр"
+                  style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }}
+                />
               </Box>
             )}
-            <div>
-              <Button variant="contained" component="label" sx={{ mb: 2 }}>
-                Загрузить изображение
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </Button>
-            </div>
-            <Button variant="contained" color="primary" type="submit">
+            <Button variant="contained" component="label" sx={{ mb: 2, width: '100%' }}>
+              Загрузить изображение
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </Button>
+            <Button variant="contained" color="primary" type="submit" sx={{ width: '100%' }}>
               Создать мероприятие
             </Button>
           </Box>

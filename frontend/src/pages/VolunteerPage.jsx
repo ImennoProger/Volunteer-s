@@ -52,7 +52,7 @@ const VolunteerPage = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
@@ -79,6 +79,8 @@ const VolunteerPage = () => {
                 border: 'none',
                 height: 'auto',
                 width: '100%',
+                padding: '0',
+                overflow: 'hidden',
               },
             }}
           >
@@ -86,7 +88,26 @@ const VolunteerPage = () => {
               showLabels
               value={selectedSection}
               onChange={(event, newValue) => handleSectionChange(newValue)}
-              sx={{ width: '100%' }}
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                '& .MuiBottomNavigationAction-root': {
+                  flex: 1,
+                  minWidth: 0,
+                  padding: 0,
+                  '& .MuiBottomNavigationAction-label': {
+                    fontSize: '0.6rem', // Уменьшение размера текста
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                  '& .MuiBottomNavigationAction-icon': {
+                    fontSize: '1.5rem', // Уменьшение размера иконок
+                  },
+                },
+              }}
             >
               <StyledBottomNavigationAction
                 label="Профиль"
@@ -121,22 +142,32 @@ const VolunteerPage = () => {
         <Drawer
           variant="permanent"
           sx={{
-            width: 300,
+            width: 240,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
-              width: 300,
+              width: 240,
               boxSizing: 'border-box',
-              border: 'none',
+              border: 'none', // Убираем границу
               marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
               backgroundColor: 'rgba(255, 255, 255, 0.00001)',
-              borderRight: '2px solid #ccc', // Добавление вертикальной линии
             },
           }}
         >
           <List>
-            <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{
+                mt: 3,
+                ml: 3,
+                mb: 3,
+                fontWeight: 'bold',
+                color: theme.palette.text.primary,  // Использование цвета текста из темы
+              }}
+            >
               Волонтёр
             </Typography>
+
             <StyledListItem button onClick={() => handleSectionChange('profile')}>
               <StyledListItemIcon>
                 <AccountCircleIcon />
@@ -175,13 +206,13 @@ const VolunteerPage = () => {
       <Box
         sx={{
           flexGrow: 1,
-          ml: isMobile ? 0 : '100px', // Отступ для ПК
-          p: 4,
+          ml: isMobile ? 0 : '240px', // Отступ для ПК
+          p: 2,
           overflow: 'auto',
           width: '100%',
         }}
       >
-        <Paper elevation={3} sx={{ p: 4 }}>
+        <Paper elevation={3} sx={{ p: 2 }}>
           {renderContent()}
         </Paper>
       </Box>

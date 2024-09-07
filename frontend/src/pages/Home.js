@@ -3,7 +3,7 @@ import axios from 'axios';
 import EventFilters from '../components/Filters/EventFilters';
 import EventMap from '../components/Map/EventMap';
 import EventCard from '../components/EventCards/EventCard';
-import { Box, Grid, CircularProgress } from '@mui/material';
+import { Box, Grid, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -11,6 +11,9 @@ function GuestPage() {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Проверка на мобильные устройства
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -79,8 +82,17 @@ function GuestPage() {
     <Box sx={{ marginTop: '64px', paddingLeft: 0, paddingRight: 0 }}>
       <Grid container spacing={2}>
         {/* Левый столбец с фильтрами */}
-        <Grid item xs={12} sm={4} md={3} sx={{ paddingLeft: 0, paddingRight: 0 }}>
-          <Box sx={{ position: 'sticky', top: '80px', paddingLeft: 0, paddingRight: '16px' }}>
+        <Grid 
+          item 
+          xs={12} 
+          sm={4} 
+          md={3} 
+          sx={{ 
+            paddingLeft: isMobile ? 0 : '16px', 
+            paddingRight: isMobile ? 0 : '16px' 
+          }}
+        >
+          <Box sx={{ position: isMobile ? 'relative' : 'sticky', top: isMobile ? '0' : '80px', padding: '16px 0' }}>
             <EventFilters onFilterChange={handleFilterChange} />
           </Box>
         </Grid>
@@ -90,7 +102,7 @@ function GuestPage() {
           <Box sx={{ mb: 2 }}>
             <EventMap events={filteredEvents} />
           </Box>
-          <Grid container spacing={2}>
+          <Grid container spacing={isMobile ? 1 : 2}>
             {filteredEvents.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event.id}>
                 <EventCard event={event} />

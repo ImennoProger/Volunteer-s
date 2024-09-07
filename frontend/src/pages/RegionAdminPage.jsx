@@ -39,8 +39,15 @@ const RegionAdminPage = () => {
     }
   };
 
+  const handleSectionChange = (newSection) => {
+    setSelectedSection(newSection);
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
@@ -68,17 +75,35 @@ const RegionAdminPage = () => {
                 border: 'none',
                 height: 'auto',
                 width: '100%',
+                padding: '0',
+                overflow: 'hidden',
               },
             }}
           >
             <BottomNavigation
               showLabels
               value={selectedSection}
-              onChange={(event, newValue) => {
-                setSelectedSection(newValue);
-                if (isMobile) setIsDrawerOpen(false);
+              onChange={(event, newValue) => handleSectionChange(newValue)}
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                '& .MuiBottomNavigationAction-root': {
+                  flex: 1,
+                  minWidth: 0,
+                  padding: 0,
+                  '& .MuiBottomNavigationAction-label': {
+                    fontSize: '0.6rem', // Уменьшение размера текста
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                  '& .MuiBottomNavigationAction-icon': {
+                    fontSize: '1.5rem', // Уменьшение размера иконок
+                  },
+                },
               }}
-              sx={{ width: '100%' }}
             >
               <StyledBottomNavigationAction
                 label="Профиль"
@@ -113,22 +138,32 @@ const RegionAdminPage = () => {
         <Drawer
           variant="permanent"
           sx={{
-            width: drawerWidth,
+            width: 240,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
+              width: 240,
               boxSizing: 'border-box',
               border: 'none',
               marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
-              backgroundColor: 'rgba(255, 255, 255, 0.00001)',
-              borderRight: '2px solid #ccc', // Добавление вертикальной линии
+              backgroundColor: 'rgba(255, 255, 255, 0.00001)'
             },
           }}
         >
           <List>
-            <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
-              Администратор региона
-            </Typography>
+          <Typography
+  variant="h5"
+  gutterBottom
+  sx={{
+    mt: 3,
+    ml: 3,
+    mb: 3,
+    fontWeight: 'bold',
+    color: theme.palette.text.primary,  // Использование цвета текста из темы
+  }}
+>
+  Администратор региона
+</Typography>
+
             <StyledListItem button onClick={() => setSelectedSection('profile')}>
               <StyledListItemIcon>
                 <AccountCircleIcon />
@@ -167,13 +202,13 @@ const RegionAdminPage = () => {
       <Box
         sx={{
           flexGrow: 1,
-          ml: isMobile ? 0 : '100px', // Отступ для ПК
+          ml: isMobile ? 0 : '130px', // Отступ для ПК
           p: 4,
           overflow: 'auto',
           width: '100%',
         }}
       >
-        <Paper elevation={3} sx={{ p: 4 }}>
+        <Paper elevation={3} sx={{ p: 2 }}>
           {renderContent()}
         </Paper>
       </Box>

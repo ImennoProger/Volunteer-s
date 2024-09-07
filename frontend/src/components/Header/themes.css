@@ -1,0 +1,149 @@
+/* Определение переменных для светлой темы */
+:root {
+  --primary-bg-color: #fafafa;
+  --secondary-bg-color: #ffffff;
+  --primary-text-color: #000000;
+  --secondary-text-color: #555555;
+  --primary-color: #1976d2;
+  --secondary-color: #dc004e;
+}
+
+/* Определение переменных для тёмной темы */
+[data-theme='dark'] {
+  --primary-bg-color: #141414;
+  --secondary-bg-color: #515050;
+  --primary-text-color: #ffffff;
+  --secondary-text-color: #b0bec5;
+  --primary-color: #90caf9;
+  --secondary-color: #f48fb1;
+}
+
+/* Основные стили */
+body {
+  background-color: var(--primary-bg-color);
+  color: var(--primary-text-color);
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Применение фоновых стилей ко всем страницам */
+.page {
+  background-color: var(--primary-bg-color);
+  color: var(--primary-text-color);
+  min-height: 100vh;
+}
+
+/* Ссылки */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--secondary-color);
+}
+
+/* Примеры стилей для компонентов */
+.header {
+  background-color: var(--secondary-bg-color);
+  color: var(--primary-text-color);
+  padding: 10px;
+}
+
+.card {
+  background-color: var(--secondary-bg-color);
+  color: var(--primary-text-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: var(--secondary-bg-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Навигационная панель */
+.nav-wrapper {
+  background-color: var(--secondary-bg-color);
+  padding: 0 10px;
+  min-height: 48px;
+  overflow: hidden;
+}
+
+.brand-logo {
+  height: 56px;
+  line-height: 56px;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-image {
+  height: 56px;
+  width: auto;
+}
+
+.brand-name {
+  flex-grow: 1;
+  text-align: center;
+  line-height: 56px;
+}
+
+.nav-buttons {
+  margin-left: auto;
+}
+
+.nav-buttons .MuiButton-root {
+  margin-left: 16px;
+}
+
+.nav-menu {
+  display: none;
+}
+
+.menu-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.menu-link:hover {
+  color: var(--secondary-color);
+}
+
+@media (max-width: 500px) {
+  .nav-buttons {
+    display: none;
+  }
+
+  .nav-menu {
+    display: flex;
+  }
+
+  .brand-logo {
+    height: 40px;
+  }
+
+  .brand-name {
+    display: none;
+  }
+}
+
+@media (min-width: 901px) {
+  .nav-buttons {
+    display: flex;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+}

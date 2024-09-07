@@ -7,3 +7,12 @@ button:focus, button:active {
     outline: none;
     box-shadow: none;
   }
+
+@media (min-width: 600px) {
+  .sidebar {
+    width: 240px; /* Ширина боковой панели для экранов шире 600px */
+  }
+  .content {
+    margin-left: 240px; /* Отступ для боковой панели */
+  }
+}
