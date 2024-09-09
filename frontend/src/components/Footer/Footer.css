@@ -1,0 +1,17 @@
+footer {
+    background-color: rgb(199, 146, 234);
+    padding: 20px;
+    text-align: center;
+  }
+  
+  footer .MuiButton-root {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+  
+  footer .MuiIconButton-root {
+    color: #ffffff;
+    margin: 0 10px;
+  }
+  

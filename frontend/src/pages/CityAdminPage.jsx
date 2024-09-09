@@ -6,7 +6,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
 import MessageIcon from '@mui/icons-material/Message';
 import BarChartIcon from '@mui/icons-material/BarChart';
-
+ 
 import { StyledBottomNavigationAction, StyledListItem, StyledListItemIcon } from './UsersPage';
 import CityAdminProfile from '../components/CityAdmin/CityAdminProfile';
 import ManageVolunteers from '../components/CityAdmin/ManageVolunteers';
@@ -39,8 +39,15 @@ const CityAdminPage = () => {
     }
   };
 
+  const handleSectionChange = (newSection) => {
+    setSelectedSection(newSection);
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
@@ -67,17 +74,35 @@ const CityAdminPage = () => {
                 border: 'none',
                 height: 'auto',
                 width: '100%',
+                padding: '0',
+                overflow: 'hidden',
               },
             }}
           >
             <BottomNavigation
               showLabels
               value={selectedSection}
-              onChange={(event, newValue) => {
-                setSelectedSection(newValue);
-                if (isMobile) setIsDrawerOpen(false);
+              onChange={(event, newValue) => handleSectionChange(newValue)}
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                '& .MuiBottomNavigationAction-root': {
+                  flex: 1,
+                  minWidth: 0,
+                  padding: 0,
+                  '& .MuiBottomNavigationAction-label': {
+                    fontSize: '0.6rem', // Уменьшение размера текста
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                  '& .MuiBottomNavigationAction-icon': {
+                    fontSize: '1.5rem', // Уменьшение размера иконок
+                  },
+                },
               }}
-              sx={{ width: '100%' }}
             >
               <StyledBottomNavigationAction
                 label="Профиль"
@@ -112,7 +137,7 @@ const CityAdminPage = () => {
         <Drawer
           variant="permanent"
           sx={{
-            width: drawerWidth,
+            width: 240,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
               width: drawerWidth,
@@ -120,14 +145,24 @@ const CityAdminPage = () => {
               border: 'none',
               marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
               backgroundColor: 'rgba(255, 255, 255, 0.00001)',
-              borderRight: '2px solid #ccc', // Добавление вертикальной линии
             },
           }}
         >
           <List>
-            <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
-              Администратор города
-            </Typography>
+          <Typography
+  variant="h5"
+  gutterBottom
+  sx={{
+    mt: 3,
+    ml: 3,
+    mb: 3,
+    fontWeight: 'bold',
+    color: theme.palette.text.primary,  // Использование цвета текста из темы
+  }}
+>
+  Администратор города
+</Typography>
+
             <StyledListItem button onClick={() => setSelectedSection('profile')}>
               <StyledListItemIcon>
                 <AccountCircleIcon />
@@ -166,13 +201,13 @@ const CityAdminPage = () => {
       <Box
         sx={{
           flexGrow: 1,
-          ml: isMobile ? 0 : '50px', // Отступ для ПК
+          ml: isMobile ? 0 : '130px', // Отступ для ПК
           p: 4,
           overflow: 'auto',
           width: '100%',
         }}
       >
-        <Paper elevation={3} sx={{ p: 4 }}>
+        <Paper elevation={3} sx={{ p: 2 }}>
           {renderContent()}
         </Paper>
       </Box>

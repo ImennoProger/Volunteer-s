@@ -1,21 +1,27 @@
 .nav-wrapper {
   background-color: rgb(199, 146, 234) !important;
-  padding: 0 10px !important; 
+  padding: 0 10px !important;
   min-height: 48px !important;
+  overflow: hidden; /* Убираем прокрутку */
 }
 
 .brand-logo {
-  height: 56px !important; 
-  line-height: 56px !important; 
-  font-size: 1.5rem; 
+  height: 56px !important;
+  line-height: 56px !important;
+  font-size: 1.5rem;
   text-decoration: none;
   color: inherit;
+}
+
+.logo-image {
+  height: 56px;
+  width: auto; /* Автоматическая ширина изображения */
 }
 
 .brand-name {
   flex-grow: 1;
   text-align: center;
-  line-height: 56px !important; 
+  line-height: 56px !important;
 }
 
 .nav-buttons {
@@ -27,7 +33,7 @@
 }
 
 .nav-menu {
-  display: none; /* Скрываем меню на мобильных устройствах */
+  display: none;
 }
 
 .menu-link {
@@ -36,12 +42,24 @@
 }
 
 .menu-link:hover {
-  color: #ffffff; /* Цвет текста при наведении */
+  color: #ffffff;
 }
 
-@media (max-width: 900px) {
-  .nav-menu {
+@media (max-width: 500px) {
+  .nav-buttons {
     display: none;
+  }
+
+  .nav-menu {
+    display: flex;
+  }
+
+  .brand-logo {
+    height: 40px;
+  }
+
+  .brand-name {
+    display: none; /* Скрываем текст на мобильных устройствах */
   }
 }
 
@@ -49,8 +67,9 @@
   .nav-buttons {
     display: flex;
   }
+
   .nav-menu {
-    display: flex;
-    align-items: center;
+    display: none;
   }
 }
+

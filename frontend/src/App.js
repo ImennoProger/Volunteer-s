@@ -5,6 +5,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ResetPassword from './components/Auth/ResetPassword';
 import Navbar from './components/Header/Navbar';
+import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
 import ProtectedPage from './pages/Protected';
 import VolunteerPage from './pages/VolunteerPage';
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
+      <Footer/>
     </ThemeProvider>
   );
 }
