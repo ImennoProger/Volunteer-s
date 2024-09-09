@@ -14,6 +14,7 @@ import SuperUserPage from './pages/SuperUserPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ChatPage from './pages/ChatPage';
+import { ThemeProvider } from './components/Header/ThemeContext';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -35,7 +36,7 @@ const App = () => {
   }, []);
 
   return (
-    <div>
+    <ThemeProvider>
       <Navbar />
       <div className="container">
         <Routes>
@@ -53,7 +54,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 

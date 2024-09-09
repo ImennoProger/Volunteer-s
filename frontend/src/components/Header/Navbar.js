@@ -1,24 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from './logo192.png';
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, useMediaQuery, useTheme, Badge, Box, Tooltip, Avatar } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, Box, Tooltip, Avatar, useMediaQuery, useTheme, Badge } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageIcon from '@mui/icons-material/Message';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import ChatIcon from '@mui/icons-material/Chat';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
 import './Navbar.css';
+import './themes.css';
+import '../../pages/globalStyless.css';
+import { useAppTheme } from './ThemeContext';
+import ChatIcon from '@mui/icons-material/Chat';
 import { useAuth } from '../Auth/AuthContext';
 
 const Navbar = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
-  const [messageAnchorEl, setMessageAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = React.useState(null);
+  const [messageAnchorEl, setMessageAnchorEl] = React.useState(null);
   const { isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useAppTheme();
   const open = Boolean(anchorEl);
   const openMessages = Boolean(messageAnchorEl);
   const openProfileMenu = Boolean(profileAnchorEl);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const themeIcon = theme === 'light' ? <Brightness4Icon /> : <Brightness7Icon />;
+  const themeIconTitle = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+  
+  const themeObject = useTheme();
+  const isMobile = useMediaQuery(themeObject.breakpoints.down('md'));
 
   const handleProfileMenuOpen = (event) => {
     setProfileAnchorEl(event.currentTarget);
@@ -49,77 +58,68 @@ const Navbar = () => {
     handleProfileMenuClose();
   };
 
-  const messages = [
-    'Сообщение 1',
-    'Сообщение 2',
-    'Сообщение 3',
-  ];
+  const messages = ['Сообщение 1', 'Сообщение 2', 'Сообщение 3'];
 
   return (
     <AppBar position="static" className="nav-wrapper">
       <Toolbar>
         <Link to="/" className="brand-logo">
-          <img src={logoImage} alt="Logo" style={{ height: '56px' }} />
+          <img src={logoImage} alt="Logo" className="logo-image" />
         </Link>
         <Typography variant="h6" className="brand-name">
           Волонтёрский портал
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
-        
-        <Tooltip title="Баланс">
-          <IconButton
-            color="inherit"
-            aria-label="balance"
-            sx={{ ml: 2 }}
-          >
-            <Badge
-              badgeContent={1500}
-              color="secondary"
-              max={10000}
-              showZero
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Баланс">
+            <IconButton color="inherit" aria-label="balance" sx={{ ml: 2, p: 1 }}>
+              <Badge
+                badgeContent={1500}
+                color="secondary"
+                max={10000}
+                showZero
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+              >
+                <AttachMoneyIcon sx={{ fontSize: 28 }} />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Чат">
+            <IconButton
+              color="inherit"
+              aria-label="chat"
+              component={Link}
+              to="/chatpage"
+              sx={{ ml: 2 }}
             >
-              <AttachMoneyIcon sx={{ fontSize: 28 }}/>
-            </Badge>
-          </IconButton>
-        </Tooltip>
-        
-        <Tooltip title="Чат">
-          <IconButton
-            color="inherit"
-            aria-label="chat"
-            component={Link}
-            to="/chatpage"
-            sx={{ ml: 2 }}
-          >
-            <ChatIcon sx={{ fontSize: 28 }} />
-          </IconButton>
-        </Tooltip>
-        
-        <Tooltip title="Сообщения">
-          <IconButton
-            color="inherit"
-            aria-label="messages"
-            onClick={handleMessageMenuOpen}
-            sx={{ ml: 2 }}
-          >
-            <Badge
-              badgeContent={5}
-              color="error"
-              showZero
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-            >
-              <MessageIcon />
-            </Badge>
-          </IconButton>
-        </Tooltip>
-        
+              <ChatIcon sx={{ fontSize: 28 }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Сообщения">
+            <IconButton color="inherit" aria-label="messages" onClick={handleMessageMenuOpen} sx={{ ml: 2, p: 1 }}>
+              <Badge
+                badgeContent={5}
+                color="error"
+                showZero
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <MessageIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          {/* Переключатель темы */}
+          <Tooltip title={themeIconTitle}>
+            <IconButton color="inherit" onClick={toggleTheme} className="theme-switcher" sx={{ ml: 2, p: 1, zIndex: 1 }}>
+              {themeIcon}
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Menu
           anchorEl={messageAnchorEl}
           open={openMessages}
@@ -128,7 +128,7 @@ const Navbar = () => {
           sx={{ mt: '45px' }}
         >
           {messages.length === 0 ? (
-            <MenuItem disabled>No new messages</MenuItem>
+            <MenuItem disabled>Нет новых сообщений</MenuItem>
           ) : (
             messages.map((message, index) => (
               <MenuItem key={index} onClick={handleMessageMenuClose}>
@@ -140,11 +140,7 @@ const Navbar = () => {
 
         {isAuthenticated ? (
           <>
-            <IconButton
-              color="inherit"
-              onClick={handleProfileMenuOpen}
-              sx={{ ml: 2 }}
-            >
+            <IconButton color="inherit" onClick={handleProfileMenuOpen} sx={{ ml: 2, p: 1 }}>
               <Avatar alt="User Avatar" />
             </IconButton>
             <Menu
@@ -153,23 +149,18 @@ const Navbar = () => {
               onClose={handleProfileMenuClose}
               sx={{ mt: '45px' }}
             >
-              <MenuItem onClick={handleProfileMenuClose}><Link to="/volunteer" className="menu-link">Настройки профиля</Link></MenuItem>
+              <MenuItem onClick={handleProfileMenuClose}>
+                <Link to="/volunteer" className="menu-link">Настройки профиля</Link>
+              </MenuItem>
               <MenuItem onClick={handleLogout}>Выйти</MenuItem>
             </Menu>
           </>
         ) : (
-          <>
-            <div className="nav-buttons">
-              <Button color="inherit" component={Link} to="/login">
-                Войти
-              </Button>
-              <Button color="inherit" component={Link} to="/register">
-                Зарегистрироваться
-              </Button>
-            </div>
-          </>
+          // Убрали кнопки Войти и Зарегистрироваться из основного меню
+          <Box sx={{ display: 'flex', alignItems: 'center' }} />
         )}
 
+        {/* Мобильное меню */}
         {isMobile ? (
           <>
             <IconButton
@@ -188,49 +179,77 @@ const Navbar = () => {
               keepMounted
               sx={{ mt: '45px' }}
             >
-              <MenuItem onClick={handleMenuClose}><Link to="/" className="menu-link">Главная</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/volunteer" className="menu-link">Волонтер</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/city-admin" className="menu-link">Адм.гор</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/region-admin" className="menu-link">Адм.рег</Link></MenuItem>
-              <MenuItem onClick={handleMenuClose}><Link to="/superuser" className="menu-link">SU</Link></MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/" className="menu-link">Главная</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/volunteer" className="menu-link">Волонтер</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/city-admin" className="menu-link">Адм.гор</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/region-admin" className="menu-link">Адм.рег</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/superuser" className="menu-link">SU</Link>
+              </MenuItem>
               {!isAuthenticated && (
                 <>
-                  <MenuItem onClick={handleMenuClose}><Link to="/login" className="menu-link">Войти</Link></MenuItem>
-                  <MenuItem onClick={handleMenuClose}><Link to="/register" className="menu-link">Зарегистрироваться</Link></MenuItem>
+                  <MenuItem onClick={handleMenuClose}>
+                    <Link to="/login" className="menu-link">Войти</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose}>
+                    <Link to="/register" className="menu-link">Зарегистрироваться</Link>
+                  </MenuItem>
                 </>
               )}
             </Menu>
           </>
         ) : (
-          <>
-            <div className="nav-menu">
-              <Button
-                color="inherit"
-                aria-controls="simple-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-              >
-                Меню
-              </Button>
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleMenuClose}
-                sx={{ mt: '45px' }}
-              >
-                <MenuItem onClick={handleMenuClose}><Link to="/volunteer" className="menu-link">Волонтер</Link></MenuItem>
-                <MenuItem onClick={handleMenuClose}><Link to="/city-admin" className="menu-link">Адм.гор</Link></MenuItem>
-                <MenuItem onClick={handleMenuClose}><Link to="/region-admin" className="menu-link">Адм.рег</Link></MenuItem>
-                <MenuItem onClick={handleMenuClose}><Link to="/superuser" className="menu-link">SU</Link></MenuItem>
-                {!isAuthenticated && (
-                  <>
-                    <MenuItem onClick={handleMenuClose}><Link to="/login" className="menu-link">Войти</Link></MenuItem>
-                    <MenuItem onClick={handleMenuClose}><Link to="/register" className="menu-link">Зарегистрироваться</Link></MenuItem>
-                  </>
-                )}
-              </Menu>
-            </div>
-          </>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              color="inherit"
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleMenuOpen}
+              sx={{ ml: 'auto' }}
+            >
+              Меню
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleMenuClose}
+              sx={{ mt: '45px' }}
+            >
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/" className="menu-link">Главная</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/volunteer" className="menu-link">Волонтер</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/city-admin" className="menu-link">Адм.гор</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/region-admin" className="menu-link">Адм.рег</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>
+                <Link to="/superuser" className="menu-link">SU</Link>
+              </MenuItem>
+              {!isAuthenticated && (
+                <>
+                  <MenuItem onClick={handleMenuClose}>
+                    <Link to="/login" className="menu-link">Войти</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose}>
+                    <Link to="/register" className="menu-link">Зарегистрироваться</Link>
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
         )}
       </Toolbar>
     </AppBar>
