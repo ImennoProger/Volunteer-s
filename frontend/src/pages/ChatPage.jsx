@@ -5,10 +5,6 @@ import { TextField, Button, List, ListItem } from '@mui/material';
 import './ChatPage.css';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-const token = localStorage.getItem('token');
-const socket = io(apiBaseUrl, {
-  query: { token }
-});
 
 const ChatPage = () => {
   const [message, setMessage] = useState('');
@@ -18,7 +14,35 @@ const ChatPage = () => {
   const [recipientName, setRecipientName] = useState('');
   const [onlineUsers, setOnlineUsers] = useState({});
 
+  // Проверка токена
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    // Если токена нет, перенаправляем на страницу входа
+    if (!token) {
+      console.error('Token not found, redirecting to login');
+      window.location.href = '/login';
+      return;  // Останавливаем дальнейшее выполнение эффекта
+    }
+
+    // Проверяем токен
+    fetch(`${apiBaseUrl}/verify-token/${token}`)
+      .then(response => {
+        if (!response.ok) {
+          // Если токен не валидный, перенаправляем на страницу входа
+          throw new Error('Invalid token');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('User token verified:', data);
+      })
+      .catch(error => {
+        console.error('Token verification error:', error);
+        window.location.href = '/login';  // Перенаправляем на страницу входа
+      });
+
+    // Получаем список пользователей
     fetch(`${apiBaseUrl}/users`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -27,7 +51,12 @@ const ChatPage = () => {
       .then(response => response.json())
       .then(data => setUsers(data))
       .catch(error => console.error('Error fetching users:', error));
-    
+
+    // Подключаем сокет
+    const socket = io(apiBaseUrl, {
+      query: { token }
+    });
+
     socket.on('chat_message', (msg) => {
       console.log('Message received:', msg);
       setMessages(prevMessages => [...prevMessages, msg]);
@@ -59,7 +88,9 @@ const ChatPage = () => {
   }, []);
 
   useEffect(() => {
-    if (recipientId) {
+    const token = localStorage.getItem('token');
+
+    if (recipientId && token) {
       fetch(`${apiBaseUrl}/chat/history/${recipientId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -76,8 +107,20 @@ const ChatPage = () => {
   }, [recipientId, users]);
 
   const handleSend = () => {
-    if (message.trim() && recipientId) {
-      console.log('Sending message:', message);
+    const token = localStorage.getItem('token');
+    if (message.trim() && recipientId && token) {
+      // Сразу добавляем сообщение в локальный список сообщений
+      const newMessage = {
+        message,
+        user_name: 'Вы',  // Или заменить на имя отправителя
+        time: new Date().toLocaleTimeString(),  // Локальное время отправки
+        isUser: true  // Флаг, чтобы отличать отправителя от получателя
+      };
+      
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+  
+      // Отправляем сообщение на сервер
+      const socket = io(apiBaseUrl, { query: { token } });
       socket.emit('chat_message', {
         message,
         token,
@@ -86,6 +129,7 @@ const ChatPage = () => {
       setMessage('');
     }
   };
+  
 
   return (
     <div className="chat-container">
