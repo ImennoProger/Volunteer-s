@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float, DateTime
 from sqlalchemy.orm import relationship, declarative_base
 from pydantic import BaseModel
 from datetime import datetime
@@ -8,6 +8,19 @@ metadata = MetaData()
 
 # Создаем базовый класс с использованием MetaData
 Base = declarative_base(metadata=metadata)
+
+class ChatMessage(Base):
+    __tablename__ = 'chat_messages'
+
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id'))
+    recipient_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id'))
+    message = Column(String, nullable=False)
+    time = Column(DateTime, default=datetime.utcnow)
+    delivered = Column(Boolean, default=False)
+
+    sender = relationship("UserMetadata", foreign_keys=[sender_id])
+    recipient = relationship("UserMetadata", foreign_keys=[recipient_id])
 
 class UserMetadata(Base):
     __tablename__ = "user_metadata"
@@ -318,3 +331,7 @@ class EventCreate(BaseModel):
     longitude: float
     class Config:
         from_attributes = True
+
+class UserInDB(BaseModel):
+    username: str
+    email: str

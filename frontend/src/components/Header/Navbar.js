@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from './logo192.png';
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, useMediaQuery, useTheme, Badge, Box, Tooltip, Avatar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageIcon from '@mui/icons-material/Message';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ChatIcon from '@mui/icons-material/Chat';
 import './Navbar.css';
 import { useAuth } from '../Auth/AuthContext';
 
@@ -64,6 +65,7 @@ const Navbar = () => {
           Волонтёрский портал
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
+        
         <Tooltip title="Баланс">
           <IconButton
             color="inherit"
@@ -84,6 +86,19 @@ const Navbar = () => {
             </Badge>
           </IconButton>
         </Tooltip>
+        
+        <Tooltip title="Чат">
+          <IconButton
+            color="inherit"
+            aria-label="chat"
+            component={Link}
+            to="/chatpage"
+            sx={{ ml: 2 }}
+          >
+            <ChatIcon sx={{ fontSize: 28 }} />
+          </IconButton>
+        </Tooltip>
+        
         <Tooltip title="Сообщения">
           <IconButton
             color="inherit"
@@ -104,6 +119,7 @@ const Navbar = () => {
             </Badge>
           </IconButton>
         </Tooltip>
+        
         <Menu
           anchorEl={messageAnchorEl}
           open={openMessages}
