@@ -11,6 +11,7 @@ import './Navbar.css';
 import './themes.css';
 import '../../pages/globalStyless.css';
 import { useAppTheme } from './ThemeContext';
+import ChatIcon from '@mui/icons-material/Chat';
 import { useAuth } from '../Auth/AuthContext';
 
 const Navbar = () => {
@@ -84,6 +85,17 @@ const Navbar = () => {
               >
                 <AttachMoneyIcon sx={{ fontSize: 28 }} />
               </Badge>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Чат">
+            <IconButton
+              color="inherit"
+              aria-label="chat"
+              component={Link}
+              to="/chatpage"
+              sx={{ ml: 2 }}
+            >
+              <ChatIcon sx={{ fontSize: 28 }} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Сообщения">

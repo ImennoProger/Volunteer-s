@@ -1,6 +1,6 @@
-// src/App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import io from 'socket.io-client';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ResetPassword from './components/Auth/ResetPassword';
@@ -14,15 +14,34 @@ import RegionAdminPage from './pages/RegionAdminPage';
 import SuperUserPage from './pages/SuperUserPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ChatPage from './pages/ChatPage';
 import { ThemeProvider } from './components/Header/ThemeContext';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const App = () => {
+  useEffect(() => {
+    const socket = io(apiBaseUrl, {
+      query: { token: localStorage.getItem('token') }
+    });
+
+    socket.on('connect', () => {
+      console.log('Подключено к серверу Socket.IO');
+    });
+
+    socket.emit('message', 'Привет с клиента');
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <Navbar />
       <div className="container">
         <Routes>
-          <Route path="/" element={<Home />} />     
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/protected" element={<ProtectedPage />} />
           <Route path="/register" element={<Register />} />
@@ -32,6 +51,7 @@ const App = () => {
           <Route path="/region-admin" element={<RegionAdminPage />} />
           <Route path="/superuser" element={<SuperUserPage />} />
           <Route path="/event/:id" element={<EventDetailsPage />} />
+          <Route path="/chatpage" element={<ChatPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
