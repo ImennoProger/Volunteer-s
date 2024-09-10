@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from './logo192.png';
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, Box, Tooltip, Avatar, useMediaQuery, useTheme, Badge } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import MessageIcon from '@mui/icons-material/Message';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -13,21 +12,40 @@ import '../../pages/globalStyless.css';
 import { useAppTheme } from './ThemeContext';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useAuth } from '../Auth/AuthContext';
+import io from 'socket.io-client';
 
 const Navbar = () => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [profileAnchorEl, setProfileAnchorEl] = React.useState(null);
-  const [messageAnchorEl, setMessageAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useAppTheme();
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const open = Boolean(anchorEl);
-  const openMessages = Boolean(messageAnchorEl);
   const openProfileMenu = Boolean(profileAnchorEl);
   const themeIcon = theme === 'light' ? <Brightness4Icon /> : <Brightness7Icon />;
   const themeIconTitle = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
   
   const themeObject = useTheme();
   const isMobile = useMediaQuery(themeObject.breakpoints.down('md'));
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const socket = io(process.env.REACT_APP_API_BASE_URL, {
+      query: { token }
+    });
+    socket.on('connect', () => {
+      console.log('Connected to socket from navbar');
+    });
+    
+    socket.on('unread_messages_count', (data) => {
+      console.log(`Unread messages count received: ${data.count}`);
+      setUnreadMessagesCount(data.count);
+    });
+
+    return () => {
+      socket.off('unread_messages_count');
+    };
+  }, []);
 
   const handleProfileMenuOpen = (event) => {
     setProfileAnchorEl(event.currentTarget);
@@ -45,20 +63,10 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
-  const handleMessageMenuOpen = (event) => {
-    setMessageAnchorEl(event.currentTarget);
-  };
-
-  const handleMessageMenuClose = () => {
-    setMessageAnchorEl(null);
-  };
-
   const handleLogout = () => {
     logout();
     handleProfileMenuClose();
   };
-
-  const messages = ['Сообщение 1', 'Сообщение 2', 'Сообщение 3'];
 
   return (
     <AppBar position="static" className="nav-wrapper">
@@ -95,49 +103,26 @@ const Navbar = () => {
               to="/chatpage"
               sx={{ ml: 2 }}
             >
-              <ChatIcon sx={{ fontSize: 28 }} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Сообщения">
-            <IconButton color="inherit" aria-label="messages" onClick={handleMessageMenuOpen} sx={{ ml: 2, p: 1 }}>
               <Badge
-                badgeContent={5}
+                badgeContent={unreadMessagesCount > 0 ? unreadMessagesCount : null}
                 color="error"
+                max={99}
                 showZero
                 anchorOrigin={{
                   vertical: 'top',
                   horizontal: 'right',
                 }}
               >
-                <MessageIcon />
+                <ChatIcon sx={{ fontSize: 28 }} />
               </Badge>
             </IconButton>
           </Tooltip>
-          {/* Переключатель темы */}
           <Tooltip title={themeIconTitle}>
             <IconButton color="inherit" onClick={toggleTheme} className="theme-switcher" sx={{ ml: 2, p: 1, zIndex: 1 }}>
               {themeIcon}
             </IconButton>
           </Tooltip>
         </Box>
-        <Menu
-          anchorEl={messageAnchorEl}
-          open={openMessages}
-          onClose={handleMessageMenuClose}
-          PaperProps={{ sx: { width: 300 } }}
-          sx={{ mt: '45px' }}
-        >
-          {messages.length === 0 ? (
-            <MenuItem disabled>Нет новых сообщений</MenuItem>
-          ) : (
-            messages.map((message, index) => (
-              <MenuItem key={index} onClick={handleMessageMenuClose}>
-                {message}
-              </MenuItem>
-            ))
-          )}
-        </Menu>
-
         {isAuthenticated ? (
           <>
             <IconButton color="inherit" onClick={handleProfileMenuOpen} sx={{ ml: 2, p: 1 }}>
@@ -156,7 +141,6 @@ const Navbar = () => {
             </Menu>
           </>
         ) : (
-          // Убрали кнопки Войти и Зарегистрироваться из основного меню
           <Box sx={{ display: 'flex', alignItems: 'center' }} />
         )}
 

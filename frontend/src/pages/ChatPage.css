@@ -40,16 +40,33 @@
 }
 
 .chat-window {
-  flex: 1;
-  padding: 20px;
+  padding: 15px;
   overflow-y: auto;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  display: flex;
+  height: auto;
 }
 
+
 .message-bubble {
-  margin-bottom: 10px;
+  margin: 10px 0;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 10px;
   max-width: 60%;
+  word-wrap: break-word;
+}
+
+.message-right {
+  background-color: #d1e7dd;
+  align-self: flex-end;
+  text-align: right;
+}
+
+.message-left {
+  background-color: #f8d7da;
+  align-self: flex-start;
+  text-align: left;
 }
 
 .message-bubble.contact {
@@ -64,10 +81,8 @@
 
 .input-field {
   display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .message-bubble {

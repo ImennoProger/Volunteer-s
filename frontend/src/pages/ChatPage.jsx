@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import 'materialize-css/dist/css/materialize.min.css';
-import { TextField, Button, List, ListItem } from '@mui/material';
+import { TextField, Button, List, ListItem, Badge, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import './ChatPage.css';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const token = localStorage.getItem('token');
+
+let socket;
 
 const ChatPage = () => {
   const [message, setMessage] = useState('');
@@ -13,36 +19,81 @@ const ChatPage = () => {
   const [recipientId, setRecipientId] = useState(null);
   const [recipientName, setRecipientName] = useState('');
   const [onlineUsers, setOnlineUsers] = useState({});
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [currentUser, setCurrentUser] = useState(null); // Добавляем состояние для текущего пользователя
+  const [currentChatPartnerId, setCurrentChatPartnerId] = useState(null);
+  const navigate = useNavigate();
 
-  // Проверка токена
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    
-    // Если токена нет, перенаправляем на страницу входа
-    if (!token) {
-      console.error('Token not found, redirecting to login');
-      window.location.href = '/login';
-      return;  // Останавливаем дальнейшее выполнение эффекта
-    }
-
-    // Проверяем токен
+    // Проверка токена
     fetch(`${apiBaseUrl}/verify-token/${token}`)
       .then(response => {
         if (!response.ok) {
-          // Если токен не валидный, перенаправляем на страницу входа
           throw new Error('Invalid token');
         }
         return response.json();
       })
       .then(data => {
         console.log('User token verified:', data);
+        setCurrentUser(data.user); // Предполагается, что ответ содержит информацию о текущем пользователе
+
+        // Инициализация socket после успешной верификации токена
+        socket = io(apiBaseUrl, {
+          query: { token }
+        });
+
+        // Подключение к сокету
+        socket.on('connect', () => {
+          console.log('Socket connected');
+        });
+
+        // Обработка входящих сообщений
+        socket.on('chat_message', (msg) => {
+          console.log('Message received:', msg);
+          if (msg.sender_id === currentUser?.user_metadata_id || msg.sender_id === currentChatPartnerId) {
+            setMessages(prevMessages => [...prevMessages, msg]);
+          }
+        });
+
+        // Обработка статуса пользователей
+        socket.on('user_status', (data) => {
+          const { user_id, status } = data;
+          setOnlineUsers(prevStatus => ({
+            ...prevStatus,
+            [user_id]: status === 'online'
+          }));
+          console.log(`User ${user_id} is now ${status}`);
+        });
+
+        // Обработка количества непрочитанных сообщений
+        socket.on('unread_messages_count', (data) => {
+          const { user_id, unread_count } = data;
+          console.log(`Unread count update: User ${user_id}, Count ${unread_count}`);
+          setUnreadCounts(prevCounts => ({
+            ...prevCounts,
+            [user_id]: unread_count
+          }));
+        });
+
+        socket.on('disconnect', () => {
+          console.log('Socket disconnected');
+        });
       })
       .catch(error => {
         console.error('Token verification error:', error);
-        window.location.href = '/login';  // Перенаправляем на страницу входа
+        navigate('/login');
       });
 
-    // Получаем список пользователей
+    return () => {
+      socket.off('chat_message');
+      socket.off('user_status');
+      socket.off('unread_messages_count');
+      socket.off('disconnect');
+    };
+  }, [currentChatPartnerId]);
+
+  useEffect(() => {
+    // Загрузка пользователей
     fetch(`${apiBaseUrl}/users`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -51,46 +102,11 @@ const ChatPage = () => {
       .then(response => response.json())
       .then(data => setUsers(data))
       .catch(error => console.error('Error fetching users:', error));
-
-    // Подключаем сокет
-    const socket = io(apiBaseUrl, {
-      query: { token }
-    });
-
-    socket.on('chat_message', (msg) => {
-      console.log('Message received:', msg);
-      setMessages(prevMessages => [...prevMessages, msg]);
-    });
-
-    socket.on('user_status', (data) => {
-      const { user_id, status } = data;
-      setOnlineUsers(prevStatus => ({
-        ...prevStatus,
-        [user_id]: status === 'online'
-      }));
-      console.log(`User ${user_id} is now ${status}`);
-    });
-
-    socket.on('connect', () => {
-      console.log('Socket connected');
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Socket disconnected');
-    });
-
-    return () => {
-      socket.off('chat_message');
-      socket.off('user_status');
-      socket.off('connect');
-      socket.off('disconnect');
-    };
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (recipientId && token) {
+    if (recipientId) {
+      // Загрузка истории сообщений
       fetch(`${apiBaseUrl}/chat/history/${recipientId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -101,26 +117,24 @@ const ChatPage = () => {
           setMessages(Array.isArray(data) ? data : []);
           const selectedUser = users.find(user => user.user_metadata_id === recipientId);
           setRecipientName(`${selectedUser?.user_name || ''} ${selectedUser?.user_surname || ''}`);
+          setUnreadCounts(prevCounts => ({
+            ...prevCounts,
+            [recipientId]: data.count
+          }));
+          console.log('Chat history and unread counts loaded:', data);
+          socket.emit('select_chat_partner', {
+            recipient_id: recipientId,
+            token
+          });
+          setCurrentChatPartnerId(recipientId);
         })
         .catch(error => console.error('Error fetching chat history:', error));
     }
   }, [recipientId, users]);
 
   const handleSend = () => {
-    const token = localStorage.getItem('token');
-    if (message.trim() && recipientId && token) {
-      // Сразу добавляем сообщение в локальный список сообщений
-      const newMessage = {
-        message,
-        user_name: 'Вы',  // Или заменить на имя отправителя
-        time: new Date().toLocaleTimeString(),  // Локальное время отправки
-        isUser: true  // Флаг, чтобы отличать отправителя от получателя
-      };
-      
-      setMessages(prevMessages => [...prevMessages, newMessage]);
-  
-      // Отправляем сообщение на сервер
-      const socket = io(apiBaseUrl, { query: { token } });
+    if (message.trim() && recipientId) {
+      console.log('Sending message:', message);
       socket.emit('chat_message', {
         message,
         token,
@@ -129,49 +143,72 @@ const ChatPage = () => {
       setMessage('');
     }
   };
-  
+
+  // Фильтрация пользователей, чтобы не отображать текущего пользователя
+  const filteredUsers = users.filter(user => user.user_metadata_id !== currentUser?.user_metadata_id);
 
   return (
     <div className="chat-container">
       <div className="sidebar">
         <List className="contact-list">
-          {users.map(user => (
+          {filteredUsers.map(user => (
             <ListItem 
               key={user.user_metadata_id} 
               onClick={() => setRecipientId(user.user_metadata_id)}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             >
-              {`${user.user_name} ${user.user_surname}`} 
-              {onlineUsers[user.user_metadata_id] ? ' (online)' : ' (offline)'}
+              <Typography variant="body1" style={{ flexGrow: 1 }}>
+                {`${user.user_name} ${user.user_surname}`}
+              </Typography>
+              <Badge badgeContent={unreadCounts[user.user_metadata_id] || 0} color="primary" style={{ marginLeft: 'auto' }} />
             </ListItem>
           ))}
         </List>
       </div>
-      <div className="chat-section">
-        <div className="chat-header">
-          <h3>{recipientName || 'Chat'} {onlineUsers[recipientId] ? '(online)' : '(offline)'}</h3>
+
+      {/* Если не выбран получатель, показываем предложение выбрать собеседника */}
+      {!recipientId ? (
+        <div className="chat-section">
+          <Typography variant="h6" align="center">
+            Пожалуйста, выберите собеседника, чтобы начать чат
+          </Typography>
         </div>
-        <div className="chat-window">
-          {messages.map((msg, index) => (
-            <div key={index} className={`message-bubble ${msg.isUser ? 'user' : 'contact'}`}>
-              <strong>{msg.user_name}</strong>: {msg.message} <br/>
-              <small>{msg.time}</small>
-            </div>
-          ))}
+      ) : (
+        <div className="chat-section">
+          <div className="chat-header">
+            <h3>{recipientName}</h3>
+          </div>
+          <div className="chat-window">
+            {messages.map((msg, index) => (
+              <div key={index} className={`message-bubble ${msg.sender_id === currentUser?.user_metadata_id ? 'message-right' : 'message-left'}`}>
+                <strong>{msg.user_name}</strong>: {msg.message} <br/>
+                <small>{format(new Date(msg.time), 'dd MMMM yyyy, HH:mm', { locale: ru })}</small>
+              </div>
+            ))}
+          </div>
+          <div
+            className="input-field"
+            tabIndex="0"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          >
+            <TextField
+              label="Ваше сообщение"
+              variant="outlined"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              fullWidth
+            />
+            <Button variant="contained" color="primary" onClick={handleSend}>
+              Отправить
+            </Button>
+          </div>
         </div>
-        <div className="input-field">
-          <TextField
-            label="Ваше сообщение"
-            variant="outlined"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            fullWidth
-          />
-          <Button variant="contained" color="primary" onClick={handleSend}>
-            Отправить
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

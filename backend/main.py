@@ -1,6 +1,6 @@
 from email.message import EmailMessage
 import smtplib
-from typing import List
+from typing import List, Dict
 import logging
 from fastapi import FastAPI, Depends, HTTPException, status, Header
 from fastapi.responses import RedirectResponse
@@ -396,7 +396,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     payload = verify_token(token=token)
     email = payload.get("sub")
     db_user = get_user_by_email(db, email=email)
-
+    user = get_current_user(token, db)
     if not email:
         raise  HTTPException(
             status_code=401, detail="Данные не корректны"
@@ -404,7 +404,13 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     if db_user.isActive == True:
-        return {"message": "Ваш аккаунт уже активирован", "status": "success"}
+        return {"message": "Ваш аккаунт уже активирован", "status": "success", "user": {
+            "user_metadata_id": user.user_metadata_id,
+            "email": user.email,
+            "user_name": user.user_name,
+            "user_surname": user.user_surname,
+            "user_patronymic": user.user_patronymic
+        }}
 
     db_user.isActive=True
     db.commit()
@@ -426,21 +432,17 @@ async def get_chat_history(
     authorization: str = Header(...),  # Ожидаем заголовок Authorization
     db: Session = Depends(get_db)
 ):
-    # Извлекаем токен из заголовка Authorization
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=400, detail="Invalid token format")
     
     token = authorization[len("Bearer "):]
 
-    # Аутентификация: получаем текущего пользователя по токену
     current_user = get_user_metadata_by_token(token, db)
 
-    # Проверяем, существует ли получатель с таким ID
     recipient = db.query(UserMetadata).filter(UserMetadata.user_metadata_id == recipient_id).first()
     if not recipient:
         raise HTTPException(status_code=404, detail="Recipient not found")
 
-    # Получаем историю сообщений между текущим пользователем и получателем с подгрузкой имен
     chat_history = db.query(ChatMessage, UserMetadata).join(
         UserMetadata, ChatMessage.sender_id == UserMetadata.user_metadata_id
     ).filter(
@@ -448,7 +450,23 @@ async def get_chat_history(
         ((ChatMessage.sender_id == recipient_id) & (ChatMessage.recipient_id == current_user.user_metadata_id))
     ).order_by(ChatMessage.time.asc()).all()
 
-    # Формируем ответ с сообщениями и именами
+    # Маркируем сообщения как прочитанные
+    db.query(ChatMessage).filter(
+        ChatMessage.sender_id == recipient_id,
+        ChatMessage.recipient_id == current_user.user_metadata_id,
+        ChatMessage.delivered == False
+    ).update({"delivered": True})
+    db.commit()
+    
+    total_unread_count = db.query(ChatMessage).filter(
+        ChatMessage.recipient_id == current_user.user_metadata_id,
+        ChatMessage.delivered == False
+    ).count()
+
+    await socket_manager.emit('unread_messages_count', {
+            'count': total_unread_count
+        }, room=f"user_{current_user.user_metadata_id}")
+
     chat_history_response = [
         {
             "sender_id": message.ChatMessage.sender_id,
@@ -456,13 +474,12 @@ async def get_chat_history(
             "message": message.ChatMessage.message,
             "time": message.ChatMessage.time.isoformat(),
             "delivered": message.ChatMessage.delivered,
-            "user_name": f"{message.UserMetadata.user_name} {message.UserMetadata.user_surname}"  # Имя отправителя
+            "user_name": f"{message.UserMetadata.user_name} {message.UserMetadata.user_surname}"
         }
         for message in chat_history
     ]
 
     return chat_history_response
-
 
 
 socket_manager = SocketManager(app=app, cors_allowed_origins=[], mount_location='/socket.io')
@@ -495,17 +512,39 @@ async def connect(sid, environ):
 
             room = f"user_{user_id}"
             await socket_manager.enter_room(sid, room)
-            print(f"User {user_id} connected and mapped to SID {sid} in room {room}")
 
             user_connections[user_id] = sid
             if room not in room_users:
                 room_users[room] = set()
             room_users[room].add(sid)
 
-            undelivered_messages = get_undelivered_messages(user_id, db)
-            print(f"Found {len(undelivered_messages)} undelivered messages for user {user_id}")
+            # Получаем список непрочитанных сообщений по каждому пользователю
+            unread_counts = {}
+            unread_messages = db.query(ChatMessage).filter(
+                ChatMessage.recipient_id == user_id,
+                ChatMessage.delivered == False
+            ).all()
+        
+            total_unread_count = 0
+            for msg in unread_messages:
+                sender_id = msg.sender_id
+                if sender_id not in unread_counts:
+                    unread_counts[sender_id] = 0
+                unread_counts[sender_id] += 1
+                total_unread_count += 1
 
-            for msg in undelivered_messages:
+            print(f"Unread messages counts for user {user_id}: {unread_counts}")
+
+            # Отправляем количество непрочитанных сообщений по каждому пользователю
+            for sender_id, count in unread_counts.items():
+                await socket_manager.emit('unread_messages_count', {
+                    'user_id': sender_id,
+                    'unread_count': count,
+                    'count': total_unread_count
+                }, room=sid)
+
+            # Отправляем непрочитанные сообщения
+            for msg in unread_messages:
                 chat_message = {
                     "user_name": f"{msg.sender.user_name} {msg.sender.user_surname}",
                     "message": msg.message,
@@ -514,14 +553,10 @@ async def connect(sid, environ):
                 }
                 await socket_manager.emit('chat_message', chat_message, room=sid)
 
-            mark_messages_as_delivered(user_id, db)
-            print(f"All undelivered messages for user {user_id} marked as delivered")
-
         except Exception as e:
             print(f"Error retrieving user or undelivered messages: {e}")
     else:
         print("No token provided, connection unauthorized")
-
 
 @socket_manager.on('disconnect')
 async def disconnect(sid):
@@ -544,8 +579,6 @@ async def disconnect(sid):
         await socket_manager.leave_room(sid, room)
         print(f"User {user_id} disconnected and left room {room}")
 
-
-
 @socket_manager.on('chat_message')
 async def handle_chat_message(sid, data):
     token = data.get("token")
@@ -562,6 +595,8 @@ async def handle_chat_message(sid, data):
         chat_message_record = save_message_to_db(user_id, recipient_id, message, db)
 
         chat_message = {
+            "recipient_id": recipient_id,
+            "sender_id": user_metadata.user_metadata_id,
             "user_name": f"{user_metadata.user_name} {user_metadata.user_surname}",
             "message": message,
             "time": chat_message_record.time.isoformat(),
@@ -574,18 +609,33 @@ async def handle_chat_message(sid, data):
         recipient_room = f"user_{recipient_id}"
         if recipient_room in room_users and room_users[recipient_room]:
             for recipient_sid in room_users[recipient_room]:
+                # Отправляем сообщение получателю
                 await socket_manager.emit('chat_message', chat_message, room=recipient_sid)
-            print(f"Message sent to recipient {recipient_id} with room {recipient_room}")
+
+                # Подсчитываем количество непрочитанных сообщений от всех пользователей для получателя
+                total_unread_count = db.query(ChatMessage).filter(
+                    ChatMessage.recipient_id == recipient_id,
+                    ChatMessage.delivered == False
+                ).count()
+
+                # Отправляем обновленное количество непрочитанных сообщений получателю
+                unread_count = db.query(ChatMessage).filter(
+                    ChatMessage.sender_id == user_id,
+                    ChatMessage.recipient_id == recipient_id,
+                    ChatMessage.delivered == False
+                ).count()
+                await socket_manager.emit('unread_messages_count', {
+                    'user_id': user_id,
+                    'unread_count': unread_count,
+                    'count': total_unread_count 
+                }, room=recipient_sid)
+
         else:
             print(f"Recipient {recipient_id} not connected or not in room {recipient_room}")
 
     except Exception as e:
         print(f"Error handling chat message: {e}")
         await socket_manager.emit('error', {'detail': str(e)}, room=sid)
-
-
-
-
 
 def save_message_to_db(sender_id, recipient_id, message, db):
     new_message = ChatMessage(
@@ -601,7 +651,3 @@ def save_message_to_db(sender_id, recipient_id, message, db):
 
 def get_undelivered_messages(user_id, db):
     return db.query(ChatMessage).filter_by(recipient_id=user_id, delivered=False).all()
-
-def mark_messages_as_delivered(user_id, db):
-    db.query(ChatMessage).filter_by(recipient_id=user_id, delivered=False).update({"delivered": True})
-    db.commit()
