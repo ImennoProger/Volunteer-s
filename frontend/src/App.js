@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { jwtDecode as jwt_decode } from 'jwt-decode';  // Обновленный импорт
 import io from 'socket.io-client';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
@@ -20,6 +21,9 @@ import { ThemeProvider } from './components/Header/ThemeContext';
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const App = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const socket = io(apiBaseUrl, {
       query: { token: localStorage.getItem('token') }
@@ -36,6 +40,67 @@ const App = () => {
     };
   }, []);
 
+// получение роли пользователя
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      try {
+        const decodedToken = jwt_decode(token);
+        setUserRole(decodedToken.role);
+      } catch (error) {
+        console.error("Invalid token", error);
+        setUserRole(null);
+        navigate('/login');  // перенаправление
+        
+      }
+    } else {
+      setUserRole(null);
+      // navigate('/login');  //  чот тут хуйня происходит какая то...
+      
+    }
+  }, [navigate]);
+
+  // изменение токена в localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decodedToken = jwt_decode(token);
+          setUserRole(decodedToken.role);
+        } catch (error) {
+          setUserRole(null);
+          navigate('/login');  
+        }
+      } else {
+        setUserRole(null);
+        navigate('/login');  
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [navigate]);
+
+  const getProfilePage = () => {
+    switch (userRole) {
+      case 'volunteer':
+        return <VolunteerPage />;
+      case 'cityadm':
+        return <CityAdminPage />;
+      case 'regionadm':
+        return <RegionAdminPage />;
+      case 'superadm':
+        return <SuperUserPage />;
+      default:
+        return <Navigate to="/" />;
+    }
+  };
+
   return (
     <ThemeProvider>
       <Navbar />
@@ -46,10 +111,7 @@ const App = () => {
           <Route path="/protected" element={<ProtectedPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/volunteer" element={<VolunteerPage />} />
-          <Route path="/city-admin" element={<CityAdminPage />} />
-          <Route path="/region-admin" element={<RegionAdminPage />} />
-          <Route path="/superuser" element={<SuperUserPage />} />
+          <Route path="/profile" element={getProfilePage()} />
           <Route path="/event/:id" element={<EventDetailsPage />} />
           <Route path="/chatpage" element={<ChatPage />} />
           <Route path="*" element={<NotFoundPage />} />

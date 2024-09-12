@@ -16,6 +16,7 @@
     "axios": "^1.7.3",
     "date-fns": "^3.6.0",
     "express-static": "^1.2.6",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.6.0",
     "materialize-css": "^1.0.0",

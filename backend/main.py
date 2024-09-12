@@ -310,7 +310,7 @@ class SendEmailVerify:
     <body>
         <h2>Подтверждение аккаунта</h2>
         <p>Нажмите на кнопку ниже, чтобы подтвердить ваш аккаунт:</p>
-        <a href="{apiBaseUrl}/verify-token/{token}" style="
+        <a href="https://volunteers-portal.ru/verify-token/{token}" style="
             display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
@@ -374,9 +374,20 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    # Роль пользователя, ее определение
+    role = None
+    if user.is_volunteer:
+        role = "volunteer"
+    elif user.is_cityadm:
+        role = "cityadm"
+    elif user.is_regionadm:
+        role = "regionadm"
+    elif user.is_superadm:
+        role = "superadm"
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.email, "role": role}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -415,7 +426,7 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
     db_user.isActive=True
     db.commit()
 
-    redirect_url = f"{apiBaseUrl}/protected?token={token}"
+    redirect_url = f"https://volunteers-portal.ru/login"
     return RedirectResponse(redirect_url)
 
 @app.get("/countries/", response_model=list[CountryCreate])
@@ -651,3 +662,8 @@ def save_message_to_db(sender_id, recipient_id, message, db):
 
 def get_undelivered_messages(user_id, db):
     return db.query(ChatMessage).filter_by(recipient_id=user_id, delivered=False).all()
+
+@app.post("/logout")
+def logout(token: str = Depends(oauth2_scheme)):
+    # Аннулирование токена: клиент просто удаляет его с клиентской стороны
+    return {"message": "Выход выполнен успешно"}
