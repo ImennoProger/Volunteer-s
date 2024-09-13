@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logoImage from './logo192.png';
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, Box, Tooltip, Avatar, useMediaQuery, useTheme, Badge } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AppBar, Toolbar, IconButton, Typography, Button, Box, Tooltip, Avatar, useMediaQuery, useTheme, Badge } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import ChatIcon from '@mui/icons-material/Chat';
+import { useAppTheme } from './ThemeContext';
+import { useAuth } from '../Auth/AuthContext';
+import io from 'socket.io-client';
 import './Navbar.css';
 import './themes.css';
 import '../../pages/globalStyless.css';
-import { useAppTheme } from './ThemeContext';
-import ChatIcon from '@mui/icons-material/Chat';
-import { useAuth } from '../Auth/AuthContext';
-import io from 'socket.io-client';
 
 const Navbar = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useAppTheme();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const open = Boolean(anchorEl);
-  const openProfileMenu = Boolean(profileAnchorEl);
   const themeIcon = theme === 'light' ? <Brightness4Icon /> : <Brightness7Icon />;
   const themeIconTitle = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
-  
+
   const themeObject = useTheme();
   const isMobile = useMediaQuery(themeObject.breakpoints.down('md'));
+  const navigate = useNavigate(); // To navigate after logout
+  const token = localStorage.getItem('token'); // Check if token exists
+  const isLoggedIn = !!token; // User authentication status
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -47,25 +45,26 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleProfileMenuOpen = (event) => {
-    setProfileAnchorEl(event.currentTarget);
-  };
-
-  const handleProfileMenuClose = () => {
-    setProfileAnchorEl(null);
-  };
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleLogout = () => {
-    logout();
-    handleProfileMenuClose();
+    fetch('http://localhost:8000/logout', { 
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        localStorage.removeItem('token'); 
+        navigate('/login'); // Redirect to login after logout
+      } else {
+        alert('Failed to log out.');
+      }
+    })
+    .catch(error => {
+      console.error('Error logging out:', error);
+      alert('Failed to log out.');
+    });
   };
 
   return (
@@ -123,118 +122,27 @@ const Navbar = () => {
             </IconButton>
           </Tooltip>
         </Box>
-        {isAuthenticated ? (
-          <>
-            <IconButton color="inherit" onClick={handleProfileMenuOpen} sx={{ ml: 2, p: 1 }}>
-              <Avatar alt="User Avatar" />
-            </IconButton>
-            <Menu
-              anchorEl={profileAnchorEl}
-              open={openProfileMenu}
-              onClose={handleProfileMenuClose}
-              sx={{ mt: '45px' }}
-            >
-              <MenuItem onClick={handleProfileMenuClose}>
-                <Link to="/volunteer" className="menu-link">Настройки профиля</Link>
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>Выйти</MenuItem>
-            </Menu>
-          </>
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center' }} />
-        )}
-
-        {/* Мобильное меню */}
-        {isMobile ? (
-          <>
-            <IconButton
-              edge="end"
-              color="inherit"
-              aria-label="menu"
-              onClick={handleMenuOpen}
-              sx={{ ml: 'auto' }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleMenuClose}
-              keepMounted
-              sx={{ mt: '45px' }}
-            >
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/" className="menu-link">Главная</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/volunteer" className="menu-link">Волонтер</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/city-admin" className="menu-link">Адм.гор</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/region-admin" className="menu-link">Адм.рег</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/superuser" className="menu-link">SU</Link>
-              </MenuItem>
-              {!isAuthenticated && (
-                <>
-                  <MenuItem onClick={handleMenuClose}>
-                    <Link to="/login" className="menu-link">Войти</Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleMenuClose}>
-                    <Link to="/register" className="menu-link">Зарегистрироваться</Link>
-                  </MenuItem>
-                </>
-              )}
-            </Menu>
-          </>
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button
-              color="inherit"
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleMenuOpen}
-              sx={{ ml: 'auto' }}
-            >
-              Меню
-            </Button>
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleMenuClose}
-              sx={{ mt: '45px' }}
-            >
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/" className="menu-link">Главная</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/volunteer" className="menu-link">Волонтер</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/city-admin" className="menu-link">Адм.гор</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/region-admin" className="menu-link">Адм.рег</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/superuser" className="menu-link">SU</Link>
-              </MenuItem>
-              {!isAuthenticated && (
-                <>
-                  <MenuItem onClick={handleMenuClose}>
-                    <Link to="/login" className="menu-link">Войти</Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleMenuClose}>
-                    <Link to="/register" className="menu-link">Зарегистрироваться</Link>
-                  </MenuItem>
-                </>
-              )}
-            </Menu>
-          </Box>
-        )}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isLoggedIn ? (
+            <>
+              <Button color="inherit" component={Link} to="/profile">
+                Профиль
+              </Button>
+              <Button color="inherit" onClick={handleLogout}>
+                Выйти
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button color="inherit" component={Link} to="/login">
+                Войти
+              </Button>
+              <Button color="inherit" component={Link} to="/register">
+                Зарегистрироваться
+              </Button>
+            </>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );

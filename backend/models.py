@@ -1,6 +1,7 @@
+from typing import Optional
 from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float, DateTime
 from sqlalchemy.orm import relationship, declarative_base
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field, validator
 from datetime import datetime
 
 # Создаем экземпляр MetaData
@@ -37,7 +38,7 @@ class UserMetadata(Base):
 
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
-    role_id = Column(Integer)
+    
 
     country = relationship("Country", back_populates="users")
     city = relationship("City", back_populates="users")
@@ -57,9 +58,13 @@ class User(Base):
 
     user_metadata_id = Column(Integer, ForeignKey("user_metadata.user_metadata_id", onupdate="CASCADE", ondelete="CASCADE"))
 
+     # роли
+    is_volunteer = Column(Boolean, default=True)
+    is_cityadm = Column(Boolean, default=False)
+    is_regionadm = Column(Boolean, default=False)
+    is_superadm = Column(Boolean, default=False)
+
     events = relationship("Event", back_populates="creator")
-    permissions = relationship("UserPermission", back_populates="user")
-    roles = relationship("UserRole", back_populates="user")
     registrations = relationship("EventRegistration", back_populates="user")
     volunteer_orgs = relationship("UserVolunteerOrg", back_populates="user")
 
@@ -83,14 +88,6 @@ def update_user_from_metadata(mapper, connection, target):
         values(email=target.email, hashed_password=target.hashed_password)
     )
 
-class Role(Base):
-    __tablename__ = "role"
-
-    role_id = Column(Integer, primary_key=True, unique=True)
-    role_name = Column(String, unique=True)
-
-    users = relationship("UserRole", back_populates="role")
-    permissions = relationship("RolePermission", back_populates="role")
 
 class Country(Base):
     __tablename__ = "country"
@@ -207,97 +204,50 @@ class UserVolunteerOrg(Base):
     class Config:
         from_attributes = True
 
-class Permission(Base):
-    __tablename__ = "permission"
-
-    permission_id = Column(Integer, primary_key=True, unique=True)
-    permission_name = Column(String, unique=True)
-    permission_details = Column(JSON)
-
-    user_permissions = relationship("UserPermission", back_populates="permission")
-    role_permissions = relationship("RolePermission", back_populates="permission")
-    class Config:
-        from_attributes = True
-
-class RolePermission(Base):
-    __tablename__ = "rolepermission"
-
-    rolepermissions_id = Column(Integer, primary_key=True, unique=True)
-    role_id = Column(Integer, ForeignKey("role.role_id", onupdate="CASCADE", ondelete="CASCADE"))
-    permission_id = Column(Integer, ForeignKey("permission.permission_id", onupdate="CASCADE", ondelete="CASCADE"))
-
-    role = relationship("Role", back_populates="permissions")
-    permission = relationship("Permission", back_populates="role_permissions")
-    class Config:
-        from_attributes = True
-
-class UserPermission(Base):
-    __tablename__ = "user_permission"
-
-    user_permission_id = Column(Integer, primary_key=True, unique=True)
-    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
-    permission_id = Column(Integer, ForeignKey("permission.permission_id", onupdate="CASCADE", ondelete="CASCADE"))
-
-    user = relationship("User", back_populates="permissions")
-    permission = relationship("Permission", back_populates="user_permissions")
-    class Config:
-        from_attributes = True
-
-class UserRole(Base):
-    __tablename__ = "user_role"
-
-    user_role_id = Column(Integer, primary_key=True, unique=True)
-    role_id = Column(Integer, ForeignKey("role.role_id", onupdate="CASCADE", ondelete="CASCADE"))
-    user_id = Column(Integer, ForeignKey("user.user_id", onupdate="CASCADE", ondelete="CASCADE"))
-
-    user = relationship("User", back_populates="roles")
-    role = relationship("Role", back_populates="users")
-    class Config:
-        from_attributes = True
+# PYDANTIC
 
 class UserMetadataCreate(BaseModel):
     username: str  # для совместимости с запросом
-    hashed_password: str
-    user_name: str
-    user_surname: str
-    user_patronymic: str
-    age: int
-    country: int
+    hashed_password: str = Field(..., min_length=8, max_length=100)
+    user_name: str = Field(..., min_length=2)
+    user_surname: str = Field(..., min_length=2)
+    user_patronymic: Optional[str] = None # может не быть отца
+    age: int = Field(..., ge=14) # условимся на том, что сайт 14+
+    country: int 
     city: int
 
 class UserMetadataRead(BaseModel):
     user_metadata_id: int
-    email: str
+    email: EmailStr
     user_name: str
     user_surname: str
-    user_patronymic: str
+    user_patronymic: Optional[str]
     age: str
     isActive: bool
     country_id: int
     city_id: int
-    #role_id: int
 
     class Config:
         from_attributes = True
 
 class CountryCreate(BaseModel):
     country_id: int
-    country_name: str
+    country_name: str = Field(..., min_length=2, max_length=100)
     class Config:
         from_attributes = True
 
 class CityCreate(BaseModel):
     city_id: int
     country_id: int
-    city_name: str
+    city_name: str = Field(..., min_length=2, max_length=100)
     class Config:
         from_attributes = True
 
 class EventRead(BaseModel):
     event_id: int
-    event_name: str
-    short_description: str
-    full_description: str
+    event_name: str = Field(..., min_length=2, max_length=100)
+    short_description: str = Field(..., min_length=10, max_length=200)
+    full_description: str = Field(..., min_length=10, max_length=1000)
     start_date: datetime
     end_date: datetime
     category_name: str
@@ -317,9 +267,9 @@ class EventRead(BaseModel):
         from_attributes = True
 
 class EventCreate(BaseModel):
-    event_name: str
-    short_description: str
-    full_description: str
+    event_name: str = Field(..., min_length=2, max_length=100)
+    short_description: str = Field(..., min_length=10, max_length=200)
+    full_description: str = Field(..., min_length=10, max_length=1000)
     start_date: str 
     end_date: str
     category_name: str
@@ -332,6 +282,12 @@ class EventCreate(BaseModel):
     class Config:
         from_attributes = True
 
+    @validator('end_date')
+    def validate_end_date(cls, end_date, values):
+        if 'start_date' in values and end_date < values['start_date']:
+            raise ValueError('End date must be after start date')
+        return end_date
+    
 class UserInDB(BaseModel):
     username: str
     email: str
