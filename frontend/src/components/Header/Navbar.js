@@ -46,7 +46,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    fetch('http://localhost:8000/logout', { 
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/logout`, { 
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
