@@ -65,15 +65,28 @@ function EventDetails() {
     fetchRecommendedEvents();
   }, [id]);
 
-  const handleRegister = () => {
-    const isLoggedIn = false; 
-
-    if (isLoggedIn) {
-      setSnackbarMessage('Вы записаны на мероприятие');
+  const handleRegister = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(`${apiBaseUrl}/event-register/`, {
+        event_id: event.event_id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.data.message === "Вы уже записаны на это мероприятие") {
+        setSnackbarMessage('Вы уже записаны на это мероприятие');
+      } else {
+          setSnackbarMessage('Вы записаны на мероприятие');
+      }
       setSnackbarOpen(true);
-    } else {
-      navigate('/login');
+      setLoading(false);
+    } catch (error) {
+      console.error('Ошибка при записи на мероприятие:', error);
+      setLoading(false);
     }
+
   };
 
   const handleCloseSnackbar = () => {

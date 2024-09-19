@@ -206,6 +206,10 @@ class UserVolunteerOrg(Base):
 
 # PYDANTIC
 
+
+class EventRegister(BaseModel):
+    event_id: int
+
 class UserMetadataCreate(BaseModel):
     username: str  # для совместимости с запросом
     hashed_password: str = Field(..., min_length=8, max_length=100)
@@ -242,6 +246,8 @@ class CityCreate(BaseModel):
     city_name: str = Field(..., min_length=2, max_length=100)
     class Config:
         from_attributes = True
+
+
 
 class EventRead(BaseModel):
     event_id: int
@@ -287,7 +293,3 @@ class EventCreate(BaseModel):
         if 'start_date' in values and end_date < values['start_date']:
             raise ValueError('End date must be after start date')
         return end_date
-    
-class UserInDB(BaseModel):
-    username: str
-    email: str

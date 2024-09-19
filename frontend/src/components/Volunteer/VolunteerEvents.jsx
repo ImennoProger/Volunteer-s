@@ -1,65 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, } from 'react';
 import { Box, Grid, Container } from '@mui/material';
 import EventFilters from '../Filters/EventFilters';
 import EventMap from '../Map/EventMap';
 import EventCard from '../EventCards/EventCard';
+import axios from 'axios';
 
 const VolunteerEvents = () => {
-  // Список мероприятий
-  const mockEvents = [
-    {
-      id: 1,
-      name: 'Концерт в парке',
-      description: 'Музыкальное мероприятие под открытым небом',
-      shortDescription: 'Приходите насладиться живой музыкой!',
-      requiredPeople: 100,
-      registeredPeople: 50,
-      points: 10,
-      awards: 'Билет на следующее мероприятие',
-      imageUrl: 'https://via.placeholder.com/150',
-      latitude: 55.751244,
-      longitude: 37.618423,
-      startDate: '2024-08-10',
-      endDate: '2024-08-12',
-      country: 'Россия',
-      city: 'Москва',
-      region: 'Центральный федеральный округ',
-      category: 'Культура',
-    },
-    {
-      id: 2,
-      name: 'Спортивное соревнование',
-      description: 'Соревнование по бегу на длинные дистанции',
-      shortDescription: 'Примите участие в забеге и получите призы!',
-      requiredPeople: 200,
-      registeredPeople: 180,
-      points: 15,
-      awards: 'Медаль и грамота',
-      imageUrl: 'https://via.placeholder.com/150',
-      latitude: 55.755826,
-      longitude: 37.6173,
-      startDate: '2024-08-15',
-      endDate: '2024-08-20',
-      country: 'Россия',
-      city: 'Москва',
-      region: 'Центральный федеральный округ',
-      category: 'Спорт',
-    },
-  ];
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  const [volunteerEvents, setVolunteerEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
 
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  useEffect(() => {
+
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${apiBaseUrl}/my-events/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const eventData = response.data.map(event => ({
+          id: event.event_id,
+          name: event.event_name,
+          description: event.full_description,
+          shortDescription: event.short_description,
+          requiredPeople: event.required_volunteers,
+          registeredPeople: event.registered_volunteers,
+          points: event.participation_points,
+          awards: event.rewards,
+          startDate: event.start_date,
+          endDate: event.end_date,
+          country: event.country_name,  
+          city: event.city_name,        
+          category: event.category_name,
+          imageUrl: event.image, 
+          latitude: event.latitude,
+          longitude: event.longitude,
+        }));
+        if (response.data.message === "Вы уже записаны на это мероприятие") {
+        } else {
+        }
+        setVolunteerEvents(eventData || []);
+        setFilteredEvents(eventData)
+      } catch (error) {
+        console.error('Ошибка при загрузке мероприятий:', error.response?.data || error.message);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   const handleFilterChange = (filters) => {
     console.log('Filter change:', filters);
 
-    const filtered = mockEvents.filter((event) => {
-      const matchCountry = filters.country ? event.country === filters.country : true;
+    const filtered = volunteerEvents.filter((event) => {
+      const matchCountry = filters.country ? event.country_name === filters.country_name : true;
       const matchCity = filters.city ? event.city === filters.city : true;
       const matchRegion = filters.region ? event.region === filters.region : true;
       const matchCategory = filters.category ? event.category === filters.category : true;
       const matchFromDate = filters.fromDate ? new Date(event.startDate) >= new Date(filters.fromDate) : true;
       const matchToDate = filters.toDate ? new Date(event.endDate) <= new Date(filters.toDate) : true;
-
+      
       return (
         matchCountry && matchCity && matchRegion &&
         matchCategory && matchFromDate && matchToDate

@@ -1,23 +1,19 @@
 from email.message import EmailMessage
 import smtplib
-from typing import List, Dict
-import logging
-from fastapi import FastAPI, Depends, HTTPException, status, Header
+from typing import List
+from fastapi import FastAPI, Depends, HTTPException, status, Header, applications
 from fastapi.responses import RedirectResponse
-import pydantic
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
-from fastapi import FastAPI
 from fastapi_socketio import SocketManager
-from database import SessionLocal, engine
+from database import SessionLocal
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, UserInDB
+from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration
 import ssl
-from sqlalchemy.orm import joinedload
 from dotenv import load_dotenv
 import os
 
@@ -105,6 +101,26 @@ async def delete_event(event_id: int, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="Event not found")
 
+@app.post("/event-register/")
+def register_on_event(event: EventRegister, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    
+    existing_registration = db.query(EventRegistration).filter(EventRegistration.user_id == current_user.user_metadata_id, EventRegistration.event_id == event.event_id).first()
+    if existing_registration:
+        return {"message": "Вы уже записаны на это мероприятие"}
+        
+
+    db_event_register = EventRegistration(
+        user_id = current_user.user_metadata_id,
+        event_id = event.event_id,
+        registration_date = datetime.utcnow()
+    )
+    db.add(db_event_register)
+    db.commit()
+    db.refresh(db_event_register)
+    return {"message": "Запись прошла успешно"}
 
 @app.post("/events/")
 def create_event(event: EventCreate, db: Session = Depends(get_session_local), token: str = Depends(oauth2_scheme)):
@@ -139,8 +155,8 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
         full_description=event.full_description,
         start_date=datetime.strptime(event.start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(event.end_date, '%Y-%m-%d'),
-        country_id=user_metadata.country_id,
-        city_id=user_metadata.city_id,
+        country_id=user_metadata.country_id, # Получать страну и город теперь нужно исходя из координат метки
+        city_id=user_metadata.city_id,       # Получать страну и город теперь нужно исходя из координат метки
         category_id=category.category_id,  # Используем ID категории
         required_volunteers=event.required_volunteers,
         registered_volunteers=0,  # Начальное значение
@@ -157,6 +173,51 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
     db.commit()
     db.refresh(db_event)
     return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
+
+
+@app.get("/my-events/", response_model=List[EventRead])
+def read_volunteer_events(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    
+    events = db.query(Event).join(EventRegistration).filter(
+        EventRegistration.user_id == current_user.user_metadata_id
+    ).options(
+        joinedload(Event.country),
+        joinedload(Event.city),
+        joinedload(Event.category)
+    ).all()
+
+
+
+    events_with_details = []
+    for event in events:
+        event_details = {
+            "event_id": event.event_id,
+            "event_name": event.event_name,
+            "short_description": event.short_description,
+            "full_description": event.full_description,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "category_name": event.category.category_name if event.category else None,
+            "required_volunteers": event.required_volunteers,
+            "participation_points": event.participation_points,
+            "rewards": event.rewards,
+            "registered_volunteers": event.registered_volunteers,
+            "country_name": event.country.country_name if event.country else None,
+            "city_name": event.city.city_name if event.city else None,
+            "user_id": event.user_id,
+            "creation_date": event.creation_date,
+            "event_status": event.event_status,
+            "image": event.image,
+            "latitude": event.latitude,
+            "longitude": event.longitude
+        }
+        events_with_details.append(event_details)
+
+
+    return events_with_details
 
 @app.get("/events/", response_model=List[EventRead])
 def read_events(db: Session = Depends(get_db)):
