@@ -13,7 +13,7 @@ from fastapi_socketio import SocketManager
 from database import SessionLocal
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat
+from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat, UserMetadataReadProfile
 import ssl
 from dotenv import load_dotenv
 import os
@@ -188,7 +188,7 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
     db.refresh(db_event)
     return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
 
-@app.get("/profile/", response_model=UserMetadataRead)
+@app.get("/profile/", response_model=UserMetadataReadProfile)
 def get_user_profile(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     current_user = get_current_user(token, db)
     if not current_user:
