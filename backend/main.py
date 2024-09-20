@@ -88,7 +88,16 @@ def unblock_user(user_metadata_id: int, db: Session = Depends(get_db)):
 
     return {"message": "Пользователь разблокирован"}
 
-@app.get("/users/", response_model=List[UserMetadataReadForChat])
+@app.get("/chat-users/", response_model=List[UserMetadataReadForChat])
+def read_users_chat(db: Session = Depends(get_db)):
+    users = db.query(UserMetadata).all()
+    
+    if not users:
+        raise HTTPException(status_code=404, detail="Users not found")
+
+    return users
+
+@app.get("/users/", response_model=List[UserMetadataRead])
 def read_users(db: Session = Depends(get_db)):
     users = db.query(UserMetadata).all()
     

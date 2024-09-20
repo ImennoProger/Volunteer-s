@@ -94,7 +94,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     // Загрузка пользователей
-    fetch(`${apiBaseUrl}/users`, {
+    fetch(`${apiBaseUrl}/chat-users`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       }
