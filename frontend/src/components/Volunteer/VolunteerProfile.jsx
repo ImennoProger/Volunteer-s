@@ -1,20 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Button, TextField, Typography, Box, Tab, Tabs, Grid, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
 import vkLogo from '../../images/vk-logo.png';
 import avatarImage from '../../images/your-avatar-image.gif';
 import '../../pages/globalStyless.css';
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const VolunteerProfile = () => {
   const [profile, setProfile] = useState({
     photo: avatarImage,
     firstName: 'Имя',
     lastName: 'Фамилия',
-    phoneNumber: '+7 950 942 49 11',
-    email: 'Почта.чипс@mail.ru',
-    city: 'Иркутск',
-    state: 'WA',
-    postcode: '31005',
-    country: 'United States',
+    phoneNumber: '',
+    email: '',
+    city: '',
+    country: '',
   });
 
   const [activeTab, setActiveTab] = useState(0);
@@ -24,6 +22,33 @@ const VolunteerProfile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  useEffect(() => {
+    // Запрос данных профиля с сервера
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/profile`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }); // Замените на актуальный URL
+        const data = await response.json();
+        setProfile({
+          photo: data.avatar_image || avatarImage,
+          firstName: data.user_name,
+          lastName: data.user_surname,
+          email: data.email,
+          city: data.city_name, // Преобразовать в название города, если нужно
+          country: data.country_name, // Преобразовать в название страны
+        });
+      } catch (error) {
+        console.error('Ошибка при загрузке профиля:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
@@ -255,9 +280,9 @@ const VolunteerProfile = () => {
 
       {/* Диалоговое окно подтверждения удаления аккаунта */}
       <Dialog open={openDialog} onClose={handleCancelDelete}>
-        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogTitle>Удаление аккаунта</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</Typography>
+          <Typography variant="body1">Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Отмена</Button>

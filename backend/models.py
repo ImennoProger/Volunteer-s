@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float, DateTime
 from sqlalchemy.orm import relationship, declarative_base
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, validator, HttpUrl
 from datetime import datetime
 
 # Создаем экземпляр MetaData
@@ -26,6 +26,7 @@ class ChatMessage(Base):
 class UserMetadata(Base):
     __tablename__ = "user_metadata"
 
+    avatar_image = Column(String)
     user_metadata_id = Column(Integer, primary_key=True, unique=True, index=True)
     email = Column(String, unique=True)
     hashed_password = Column(String)
@@ -206,6 +207,8 @@ class UserVolunteerOrg(Base):
 
 # PYDANTIC
 
+class UserAvatarUpdate(BaseModel):
+    avatar_image: HttpUrl
 
 class EventRegister(BaseModel):
     event_id: int
@@ -221,6 +224,7 @@ class UserMetadataCreate(BaseModel):
     city: int
 
 class UserMetadataRead(BaseModel):
+    avatar_image: Optional[str]
     user_metadata_id: int
     email: EmailStr
     user_name: str
@@ -230,6 +234,8 @@ class UserMetadataRead(BaseModel):
     isActive: bool
     country_id: int
     city_id: int
+    country_name: Optional[str]
+    city_name: Optional[str]
 
     class Config:
         from_attributes = True

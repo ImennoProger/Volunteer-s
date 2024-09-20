@@ -1,7 +1,8 @@
 from email.message import EmailMessage
 import smtplib
 from typing import List
-from fastapi import FastAPI, Depends, HTTPException, status, Header, applications
+from uuid import uuid4
+from fastapi import FastAPI, Depends, HTTPException, status, Header, UploadFile, File
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session, joinedload
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -22,6 +23,7 @@ load_dotenv()
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 300
+UPLOAD_DIR = "uploads/avatars"
 
 apiBaseUrl = os.getenv('REACT_APP_API_BASE_URL')
 app = FastAPI()
@@ -31,6 +33,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 origins = [
     "*"
 ]
+
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
 
 app.add_middleware(
     CORSMiddleware,
@@ -174,6 +179,46 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
     db.refresh(db_event)
     return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
 
+@app.get("/profile/", response_model=UserMetadataRead)
+def get_user_profile(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    user_metadata = db.query(UserMetadata).filter(UserMetadata.user_metadata_id == current_user.user_metadata_id).first()
+
+    if not user_metadata:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user_metadata.country_name = db.query(Country.country_name).filter(Country.country_id == user_metadata.country_id).scalar()
+    user_metadata.city_name = db.query(City.city_name).filter(City.city_id == user_metadata.city_id).scalar()
+    
+    return user_metadata
+
+@app.post("/profile/avatar/")
+async def upload_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
+):
+    current_user = get_current_user(token, db)
+    # Проверка типа файла
+    if file.content_type not in ["image/jpeg", "image/png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG and PNG are allowed.")
+
+    # Создание уникального имени файла
+    filename = f"{uuid4()}.{file.filename.split('.')[-1]}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+
+    # Сохранение файла
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    # Обновление информации о пользователе
+    current_user.avatar_image = file_path
+    db.add(current_user)
+    db.commit()
+
+    return {"message": "Avatar updated successfully", "avatar_url": file_path}
 
 @app.get("/my-events/", response_model=List[EventRead])
 def read_volunteer_events(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):

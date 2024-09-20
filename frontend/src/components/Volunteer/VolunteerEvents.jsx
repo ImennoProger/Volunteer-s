@@ -1,12 +1,13 @@
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Grid, Container } from '@mui/material';
 import EventFilters from '../Filters/EventFilters';
 import EventMap from '../Map/EventMap';
 import EventCard from '../EventCards/EventCard';
 import axios from 'axios';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const VolunteerEvents = () => {
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   const [volunteerEvents, setVolunteerEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
 
