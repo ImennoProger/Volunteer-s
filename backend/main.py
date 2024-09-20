@@ -13,7 +13,7 @@ from fastapi_socketio import SocketManager
 from database import SessionLocal
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration
+from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat
 import ssl
 from dotenv import load_dotenv
 import os
@@ -22,7 +22,7 @@ load_dotenv()
 
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 300
+ACCESS_TOKEN_EXPIRE_MINUTES = 30000
 UPLOAD_DIR = "uploads/avatars"
 
 apiBaseUrl = os.getenv('REACT_APP_API_BASE_URL')
@@ -88,7 +88,7 @@ def unblock_user(user_metadata_id: int, db: Session = Depends(get_db)):
 
     return {"message": "Пользователь разблокирован"}
 
-@app.get("/users/", response_model=List[UserMetadataRead])
+@app.get("/users/", response_model=List[UserMetadataReadForChat])
 def read_users(db: Session = Depends(get_db)):
     users = db.query(UserMetadata).all()
     

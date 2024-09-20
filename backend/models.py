@@ -240,6 +240,22 @@ class UserMetadataRead(BaseModel):
     class Config:
         from_attributes = True
 
+class UserMetadataReadForChat(BaseModel):
+    avatar_image: Optional[str]
+    user_metadata_id: int
+    email: EmailStr
+    user_name: str
+    user_surname: str
+    user_patronymic: Optional[str]
+    age: str
+    isActive: bool
+    country_id: int
+    city_id: int
+
+    class Config:
+        from_attributes = True
+
+
 class CountryCreate(BaseModel):
     country_id: int
     country_name: str = Field(..., min_length=2, max_length=100)
