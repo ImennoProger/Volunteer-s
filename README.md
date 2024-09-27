@@ -16,3 +16,9 @@
 + Донцова Кристина
 + Бельков Максим 
 
+<div style="display: flex; justify-content: center;">
+    <img src="https://i.pinimg.com/736x/43/25/22/43252267fc0ec83dfd68735fdffcac28.jpg" alt="Волонтерский портал" width="10%" style="margin-right: 10px;" />
+    <img src="https://i.pinimg.com/564x/62/7f/02/627f02f44414c4e2982410ae0c424f4c.jpg" alt="Волонтерский портал" width="10%" style="margin-right: 10px;" />
+    <img src="https://i.pinimg.com/564x/8b/4a/0b/8b4a0b7b02dd11c6aab55e6321575cd3.jpg" alt="Волонтерский портал" width="8%" style="margin-right: 10px;" />
+    <img src="https://i.pinimg.com/564x/65/4c/9b/654c9b009a6cde3b72a35045a4ab9b5f.jpg" alt="Волонтерский портал" width="10%" />
+</div>
