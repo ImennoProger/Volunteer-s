@@ -1,3 +1,4 @@
+#Волонтёрский портал
 python -m venv .venv
 
 cd backend
