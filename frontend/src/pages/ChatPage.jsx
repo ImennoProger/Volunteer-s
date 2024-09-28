@@ -26,7 +26,11 @@ const ChatPage = () => {
 
   useEffect(() => {
     // Проверка токена
-    fetch(`${apiBaseUrl}/verify-token/${token}`)
+    fetch(`${apiBaseUrl}/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,  // Используем токен для аутентификации
+      }
+    })
       .then(response => {
         if (!response.ok) {
           throw new Error('Invalid token');
@@ -35,8 +39,7 @@ const ChatPage = () => {
       })
       .then(data => {
         console.log('User token verified:', data);
-        setCurrentUser(data.user); // Предполагается, что ответ содержит информацию о текущем пользователе
-
+        setCurrentUser(data); // Предполагается, что ответ содержит информацию о текущем пользователе
         // Инициализация socket после успешной верификации токена
         socket = io(apiBaseUrl, {
           query: { token }
@@ -143,7 +146,6 @@ const ChatPage = () => {
       setMessage('');
     }
   };
-
   // Фильтрация пользователей, чтобы не отображать текущего пользователя
   const filteredUsers = users.filter(user => user.user_metadata_id !== currentUser?.user_metadata_id);
 
