@@ -22,24 +22,24 @@ const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const App = () => {
   const [userRole, setUserRole] = useState(null);
+  const [socket, setSocket] = useState(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    const socket = io(apiBaseUrl, {
-      query: { token: localStorage.getItem('token') }
+    const token = localStorage.getItem('token');
+    const newSocket = io(process.env.REACT_APP_API_BASE_URL, {
+      query: { token }
     });
+    setSocket(newSocket);
 
-    socket.on('connect', () => {
-      console.log('Подключено к серверу Socket.IO');
+    newSocket.on('connect', () => {
+      console.log('Socket connected App.js');
     });
-
-    socket.emit('message', 'Привет с клиента');
 
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
     };
   }, []);
-
 // получение роли пользователя
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -103,7 +103,7 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <Navbar />
+      <Navbar socket={socket} />
       <div className="container">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -113,7 +113,7 @@ const App = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={getProfilePage()} />
           <Route path="/event/:id" element={<EventDetailsPage />} />
-          <Route path="/chatpage" element={<ChatPage />} />
+          <Route path="/chatpage" element={<ChatPage socket={socket} />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

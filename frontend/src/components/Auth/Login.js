@@ -49,6 +49,7 @@ function Login() {
         const data = await response.json();
         login(data.access_token);
         navigate('/');
+        window.location.reload();
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Authentication failed!');

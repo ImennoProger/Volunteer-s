@@ -10,9 +10,7 @@ import './ChatPage.css';
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const token = localStorage.getItem('token');
 
-let socket;
-
-const ChatPage = () => {
+const ChatPage = ({ socket }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
@@ -39,16 +37,9 @@ const ChatPage = () => {
       })
       .then(data => {
         console.log('User token verified:', data);
+        console.log('token:', token);
         setCurrentUser(data); // Предполагается, что ответ содержит информацию о текущем пользователе
         // Инициализация socket после успешной верификации токена
-        socket = io(apiBaseUrl, {
-          query: { token }
-        });
-
-        // Подключение к сокету
-        socket.on('connect', () => {
-          console.log('Socket connected');
-        });
 
         // Обработка входящих сообщений
         socket.on('chat_message', (msg) => {

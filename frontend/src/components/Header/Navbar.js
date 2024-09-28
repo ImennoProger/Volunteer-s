@@ -13,7 +13,7 @@ import './Navbar.css';
 import './themes.css';
 import '../../pages/globalStyless.css';
 
-const Navbar = () => {
+const Navbar = ({ socket }) => {
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useAppTheme();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
@@ -27,44 +27,22 @@ const Navbar = () => {
   const isLoggedIn = !!token; // User authentication status
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const socket = io(process.env.REACT_APP_API_BASE_URL, {
-      query: { token }
-    });
-    socket.on('connect', () => {
-      console.log('Connected to socket from navbar');
-    });
-    
+    if (!socket) return;
+
     socket.on('unread_messages_count', (data) => {
-      console.log(`Unread messages count received: ${data.count}`);
+      console.log(`Получено количество непрочитанных сообщений: ${data.count}`);
       setUnreadMessagesCount(data.count);
     });
 
     return () => {
       socket.off('unread_messages_count');
     };
-  }, []);
+  }, [socket]);
 
   const handleLogout = () => {
-    fetch(`${process.env.REACT_APP_API_BASE_URL}/logout`, { 
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        localStorage.removeItem('token'); 
-        navigate('/login'); // Redirect to login after logout
-      } else {
-        alert('Failed to log out.');
-      }
-    })
-    .catch(error => {
-      console.error('Error logging out:', error);
-      alert('Failed to log out.');
-    });
+    localStorage.removeItem('token');
+    socket.disconnect();
+    navigate('/login');
   };
 
   return (
