@@ -15,36 +15,33 @@ import {
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const ManageVolunteers = () => {
-
   const [volunteers, setVolunteers] = useState([]);
 
   const fetchVolunteers = async () => {
     try {
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem('token');
       const response = await axios.get(`${apiBaseUrl}/users/`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setVolunteers(response.data); 
+      setVolunteers(response.data);
     } catch (error) {
       console.error('Ошибка при получении волонтеров:', error.response?.data || error.message);
     }
   };
 
-  // Используем useEffect для получения данных при монтировании компонента
   useEffect(() => {
-    fetchVolunteers(); // Вызываем функцию получения данных
-  }, []); // Пустой массив зависимостей означает, что эффект выполнится один раз при монтировании
+    fetchVolunteers();
+  }, []);
 
-  // Функция для блокировки волонтера
   const handleBlock = async (id) => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(`${apiBaseUrl}/users/block/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setVolunteers((prev) =>
@@ -59,14 +56,13 @@ const ManageVolunteers = () => {
     }
   };
 
-  // Функция для разблокировки волонтера
   const handleUnblock = async (id) => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(`${apiBaseUrl}/users/unblock/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setVolunteers((prev) =>
@@ -86,8 +82,8 @@ const ManageVolunteers = () => {
       const token = localStorage.getItem('token');
       await axios.delete(`${apiBaseUrl}/users/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setVolunteers((prev) => prev.filter((volunteer) => volunteer.user_metadata_id !== id));
@@ -97,9 +93,9 @@ const ManageVolunteers = () => {
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 2 }}>
+    <Paper elevation={3} sx={{ p: 4 }}>
       <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-      Управление волонтёрами
+        Управление волонтёрами
       </Typography>
       <TableContainer>
         <Table>
@@ -117,20 +113,20 @@ const ManageVolunteers = () => {
               <TableRow key={volunteer.user_metadata_id}>
                 <TableCell>{volunteer.user_name}</TableCell>
                 <TableCell>{volunteer.user_surname}</TableCell>
-                <TableCell>{volunteer.email}</TableCell> 
+                <TableCell>{volunteer.email}</TableCell>
                 <TableCell>
                   {volunteer.status ? 'Заблокирован' : 'Активный'}
                 </TableCell>
                 <TableCell>
                   {volunteer.status ? (
                     <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleUnblock(volunteer.user_metadata_id)}
-                    sx={{ mr: 1 }}
-                  >
-                    Разблокировать
-                  </Button>
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleUnblock(volunteer.user_metadata_id)}
+                      sx={{ mr: 1 }}
+                    >
+                      Разблокировать
+                    </Button>
                   ) : (
                     <Button
                       variant="outlined"

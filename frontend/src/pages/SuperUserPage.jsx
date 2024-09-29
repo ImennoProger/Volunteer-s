@@ -5,11 +5,19 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StarIcon from '@mui/icons-material/Star';
 import CategoryIcon from '@mui/icons-material/Category';
 import BadgeIcon from '@mui/icons-material/Badge';
-
+import { StyledBottomNavigationAction, StyledListItem, StyledListItemIcon } from './UsersPage';
 import SuperUserProfile from '../components/SuperUser/SuperUserProfile';
 import CreateRanks from '../components/SuperUser/CreateRanks';
 import CreateCategories from '../components/SuperUser/CreateCategories';
 import CreateAwards from '../components/SuperUser/CreateAwards';
+import GroupIcon from '@mui/icons-material/Group';
+import EventIcon from '@mui/icons-material/Event';
+import MessageIcon from '@mui/icons-material/Message';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import ManageVolunteers from '../components/CityAdmin/ManageVolunteers';
+import ManageEvents from '../components/CityAdmin/ManageEvents';
+import MessageBroadcast from '../components/CityAdmin/MessageBroadcast';
+import CityStatistics from '../components/CityAdmin/CityStatistics';
 
 const drawerWidth = 300;
 
@@ -29,13 +37,21 @@ const SuperUserPage = () => {
         return <CreateCategories />;
       case 'awards':
         return <CreateAwards />;
+      case 'volunteers':
+        return <ManageVolunteers />;
+      case 'events':
+        return <ManageEvents />;
+      case 'messages':
+        return <MessageBroadcast />;
+      case 'statistics':
+        return <CityStatistics />;
       default:
         return <SuperUserProfile />;
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       {/* Мобильная навигационная панель */}
       {isMobile ? (
         <>
@@ -86,6 +102,26 @@ const SuperUserPage = () => {
                 icon={<BadgeIcon />}
                 onClick={() => { setSelectedSection('awards'); setIsDrawerOpen(false); }}
               />
+              <BottomNavigationAction
+                label="Награды"
+                icon={<BadgeIcon />}
+                onClick={() => { setSelectedSection('volunteers'); setIsDrawerOpen(false); }}
+              />
+              <BottomNavigationAction
+                label="Награды"
+                icon={<BadgeIcon />}
+                onClick={() => { setSelectedSection('events'); setIsDrawerOpen(false); }}
+              />
+              <BottomNavigationAction
+                label="Награды"
+                icon={<BadgeIcon />}
+                onClick={() => { setSelectedSection('messages'); setIsDrawerOpen(false); }}
+              />
+              <BottomNavigationAction
+                label="Награды"
+                icon={<BadgeIcon />}
+                onClick={() => { setSelectedSection('statistics'); setIsDrawerOpen(false); }}
+              />
             </BottomNavigation>
           </Drawer>
         </>
@@ -109,31 +145,56 @@ const SuperUserPage = () => {
             <Typography variant="h5" gutterBottom sx={{ mt: 3, ml: 3, mb: 3, fontWeight: 'bold', color: 'black' }}>
               SuperUser
             </Typography>
-            <ListItem button onClick={() => setSelectedSection('profile')}>
-              <ListItemIcon>
+            <ListItem button onClick={() => setSelectedSection('profile')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
                 <AccountCircleIcon />
               </ListItemIcon>
               <ListItemText primary="Настройки профиля" />
             </ListItem>
-            <ListItem button onClick={() => setSelectedSection('ranks')}>
-              <ListItemIcon>
+            <ListItem button onClick={() => setSelectedSection('ranks')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
                 <StarIcon />
               </ListItemIcon>
               <ListItemText primary="Создание рангов" />
             </ListItem>
-            <ListItem button onClick={() => setSelectedSection('categories')}>
-              <ListItemIcon>
+            <ListItem button onClick={() => setSelectedSection('categories')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
                 <CategoryIcon />
               </ListItemIcon>
               <ListItemText primary="Создание категорий" />
             </ListItem>
-            <ListItem button onClick={() => setSelectedSection('awards')}>
-              <ListItemIcon>
+            <ListItem button onClick={() => setSelectedSection('awards')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
                 <BadgeIcon />
               </ListItemIcon>
               <ListItemText primary="Создание наград" />
             </ListItem>
+            <ListItem button onClick={() => setSelectedSection('volunteers')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary="Управление волонтёрами" />
+            </ListItem>
+            <ListItem button onClick={() => setSelectedSection('events')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
+                <EventIcon />
+              </ListItemIcon>
+              <ListItemText primary="Управление мероприятиями" />
+            </ListItem>
+            <ListItem button onClick={() => setSelectedSection('messages')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
+                <MessageIcon />
+              </ListItemIcon>
+              <ListItemText primary="Рассылка сообщений" />
+            </ListItem>
+            <ListItem button onClick={() => setSelectedSection('statistics')} sx={{ minWidth: '250px' }}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>
+                <BarChartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Статистика по городу" />
+            </ListItem>
           </List>
+
         </Drawer>
       )}
 
