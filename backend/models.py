@@ -1,13 +1,10 @@
 from typing import Optional
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, JSON, TIMESTAMP, UniqueConstraint, event, MetaData, Float, DateTime
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, TIMESTAMP, UniqueConstraint, event, MetaData, Float, DateTime
 from sqlalchemy.orm import relationship, declarative_base
-from pydantic import BaseModel, EmailStr, Field, validator, HttpUrl
 from datetime import datetime
 
-# Создаем экземпляр MetaData
 metadata = MetaData()
 
-# Создаем базовый класс с использованием MetaData
 Base = declarative_base(metadata=metadata)
 
 class ChatMessage(Base):
@@ -39,7 +36,6 @@ class UserMetadata(Base):
 
     country_id = Column(Integer, ForeignKey("country.country_id", onupdate="CASCADE", ondelete="SET NULL"))
     city_id = Column(Integer, ForeignKey("city.city_id", onupdate="CASCADE", ondelete="SET NULL"))
-    
 
     country = relationship("Country", back_populates="users")
     city = relationship("City", back_populates="users")
@@ -59,7 +55,6 @@ class User(Base):
 
     user_metadata_id = Column(Integer, ForeignKey("user_metadata.user_metadata_id", onupdate="CASCADE", ondelete="CASCADE"))
 
-     # роли
     is_volunteer = Column(Boolean, default=True)
     is_cityadm = Column(Boolean, default=False)
     is_regionadm = Column(Boolean, default=False)
@@ -89,7 +84,6 @@ def update_user_from_metadata(mapper, connection, target):
         values(email=target.email, hashed_password=target.hashed_password)
     )
 
-
 class Country(Base):
     __tablename__ = "country"
 
@@ -100,8 +94,6 @@ class Country(Base):
     users = relationship("UserMetadata", back_populates="country")
     events = relationship("Event", back_populates="country")
     volunteer_orgs = relationship("VolunteerOrg", back_populates="country")
-    class Config:
-        from_attributes = True
 
 class City(Base):
     __tablename__ = "city"
@@ -114,8 +106,6 @@ class City(Base):
     users = relationship("UserMetadata", back_populates="city")
     events = relationship("Event", back_populates="city")
     volunteer_orgs = relationship("VolunteerOrg", back_populates="city")
-    class Config:
-        from_attributes = True
 
 class VolunteerOrg(Base):
     __tablename__ = "volunteer_org"
@@ -135,8 +125,6 @@ class VolunteerOrg(Base):
     country = relationship("Country", back_populates="volunteer_orgs")
     city = relationship("City", back_populates="volunteer_orgs")
     members = relationship("UserVolunteerOrg", back_populates="volunteer_org")
-    class Config:
-        from_attributes = True
 
 class Event(Base):
     __tablename__ = "event"
@@ -166,8 +154,6 @@ class Event(Base):
     category = relationship("Category", back_populates="events")
     creator = relationship("User", back_populates="events")
     registrations = relationship("EventRegistration", back_populates="event")
-    class Config:
-        from_attributes = True
 
 class Category(Base):
     __tablename__ = "category"
@@ -176,8 +162,6 @@ class Category(Base):
     category_name = Column(String, unique=True)
 
     events = relationship("Event", back_populates="category")
-    class Config:
-        from_attributes = True
 
 class EventRegistration(Base):
     __tablename__ = "event_registration"
@@ -189,8 +173,6 @@ class EventRegistration(Base):
 
     user = relationship("User", back_populates="registrations")
     event = relationship("Event", back_populates="registrations")
-    class Config:
-        from_attributes = True
 
 class UserVolunteerOrg(Base):
     __tablename__ = "user_volunteer_org"
@@ -202,132 +184,3 @@ class UserVolunteerOrg(Base):
 
     user = relationship("User", back_populates="volunteer_orgs")
     volunteer_org = relationship("VolunteerOrg", back_populates="members")
-    class Config:
-        from_attributes = True
-
-# PYDANTIC
-
-class UserAvatarUpdate(BaseModel):
-    avatar_image: HttpUrl
-
-class EventRegister(BaseModel):
-    event_id: int
-
-class UserMetadataCreate(BaseModel):
-    username: str  # для совместимости с запросом
-    hashed_password: str = Field(..., min_length=8, max_length=100)
-    user_name: str = Field(..., min_length=2)
-    user_surname: str = Field(..., min_length=2)
-    user_patronymic: Optional[str] = None # может не быть отца
-    age: int = Field(..., ge=14) # условимся на том, что сайт 14+
-    country: int 
-    city: int
-
-class UserMetadataRead(BaseModel):
-    avatar_image: Optional[str]
-    user_metadata_id: int
-    email: EmailStr
-    user_name: str
-    user_surname: str
-    user_patronymic: Optional[str]
-    age: str
-    isActive: bool
-    country_id: int
-    city_id: int
-
-    class Config:
-        from_attributes = True
-
-class UserMetadataReadProfile(BaseModel):
-    avatar_image: Optional[str]
-    user_metadata_id: int
-    email: EmailStr
-    user_name: str
-    user_surname: str
-    user_patronymic: Optional[str]
-    age: str
-    isActive: bool
-    country_id: int
-    city_id: int
-    country_name: Optional[str]
-    city_name: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class UserMetadataReadForChat(BaseModel):
-    avatar_image: Optional[str]
-    user_metadata_id: int
-    email: EmailStr
-    user_name: str
-    user_surname: str
-    user_patronymic: Optional[str]
-    age: str
-    isActive: bool
-    country_id: int
-    city_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class CountryCreate(BaseModel):
-    country_id: int
-    country_name: str = Field(..., min_length=2, max_length=100)
-    class Config:
-        from_attributes = True
-
-class CityCreate(BaseModel):
-    city_id: int
-    country_id: int
-    city_name: str = Field(..., min_length=2, max_length=100)
-    class Config:
-        from_attributes = True
-
-
-
-class EventRead(BaseModel):
-    event_id: int
-    event_name: str = Field(..., min_length=2, max_length=100)
-    short_description: str = Field(..., min_length=10, max_length=200)
-    full_description: str = Field(..., min_length=10, max_length=1000)
-    start_date: datetime
-    end_date: datetime
-    category_name: str
-    required_volunteers: int
-    participation_points: int
-    rewards: str
-    registered_volunteers: int
-    country_name: str
-    city_name: str
-    user_id: int
-    image: str
-    creation_date: datetime
-    event_status: bool
-    latitude: float
-    longitude: float
-    class Config:
-        from_attributes = True
-
-class EventCreate(BaseModel):
-    event_name: str = Field(..., min_length=2, max_length=100)
-    short_description: str = Field(..., min_length=10, max_length=200)
-    full_description: str = Field(..., min_length=10, max_length=1000)
-    start_date: str 
-    end_date: str
-    category_name: str
-    required_volunteers: int
-    participation_points: int
-    rewards: str
-    image: str
-    latitude: float
-    longitude: float
-    class Config:
-        from_attributes = True
-
-    @validator('end_date')
-    def validate_end_date(cls, end_date, values):
-        if 'start_date' in values and end_date < values['start_date']:
-            raise ValueError('End date must be after start date')
-        return end_date

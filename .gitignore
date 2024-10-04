@@ -1,2 +1,10 @@
-/venv/
-node_modules/
+# folder root
+venv
+
+# backend
+backend\alembic.ini
+backend\database.py
+
+#frontend
+frontend\node_modules
+frontend\.env

@@ -11,9 +11,11 @@ from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 from fastapi_socketio import SocketManager
 from database import SessionLocal
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat, UserMetadataReadProfile
+from models import ChatMessage, UserMetadata, User, Country, City, VolunteerOrg, Event, Category, EventRegistration, UserVolunteerOrg
+from schemas import (CountryCreate, CityCreate, UserMetadataCreate, UserMetadataRead, 
+                     UserMetadataReadForChat, UserMetadataReadProfile, EventRead, 
+                     EventCreate, EventRegister)
 import ssl
 from dotenv import load_dotenv
 import os
