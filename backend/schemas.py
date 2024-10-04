@@ -13,8 +13,8 @@ class UserMetadataCreate(BaseModel):
     hashed_password: str = Field(..., min_length=8, max_length=100)
     user_name: str = Field(..., min_length=2)
     user_surname: str = Field(..., min_length=2)
-    user_patronymic: Optional[str] = None # может не быть отца
-    age: int = Field(..., ge=14) # условимся на том, что сайт 14+
+    user_patronymic: Optional[str] = None 
+    age: int = Field(..., ge=14) 
     country: int 
     city: int
 

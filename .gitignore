@@ -2,8 +2,8 @@
 venv
 
 # backend
-backend\alembic.ini
-backend\database.py
+# backend\alembic.ini
+# backend\database.py
 
 #frontend
 frontend\node_modules
