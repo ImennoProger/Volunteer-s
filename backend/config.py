@@ -12,3 +12,4 @@ DB_PASS = os.environ.get("DB_PASS")
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30000
+UPLOAD_DIR = "uploads/avatars"
