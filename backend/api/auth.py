@@ -9,6 +9,7 @@ from schemas import UserMetadataCreate
 from services.auth_service import create_user_metadata, authenticate_user, create_access_token, verify_token
 from services.email_service import SendEmailVerify
 from fastapi.responses import RedirectResponse
+from services.auth_service import oauth2_scheme
 
 router = APIRouter()
 
@@ -75,3 +76,8 @@ async def verify_user_token(token: str, db: Session = Depends(get_db)):
 
     redirect_url = f"https://volunteers-portal.ru/login"
     return RedirectResponse(redirect_url)
+
+@router.post("/logout")
+def logout(token: str = Depends(oauth2_scheme)):
+    # Аннулирование токена: клиент просто удаляет его с клиентской стороны
+    return {"message": "Выход выполнен успешно"}

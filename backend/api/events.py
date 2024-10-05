@@ -159,3 +159,45 @@ def create_event(event: EventCreate, db: Session = Depends(get_session_local), t
     db.commit()
     db.refresh(db_event)
     return {"message": "Мероприятие создано успешно", "event_id": db_event.event_id}
+
+
+@router.get("/my-events/", response_model=List[EventRead])
+def read_volunteer_events(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    
+    events = db.query(Event).join(EventRegistration).filter(
+        EventRegistration.user_id == current_user.user_metadata_id
+    ).options(
+        joinedload(Event.country),
+        joinedload(Event.city),
+        joinedload(Event.category)
+    ).all()
+
+    events_with_details = []
+    for event in events:
+        event_details = {
+            "event_id": event.event_id,
+            "event_name": event.event_name,
+            "short_description": event.short_description,
+            "full_description": event.full_description,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "category_name": event.category.category_name if event.category else None,
+            "required_volunteers": event.required_volunteers,
+            "participation_points": event.participation_points,
+            "rewards": event.rewards,
+            "registered_volunteers": event.registered_volunteers,
+            "country_name": event.country.country_name if event.country else None,
+            "city_name": event.city.city_name if event.city else None,
+            "user_id": event.user_id,
+            "creation_date": event.creation_date,
+            "event_status": event.event_status,
+            "image": event.image,
+            "latitude": event.latitude,
+            "longitude": event.longitude
+        }
+        events_with_details.append(event_details)
+
+    return events_with_details
