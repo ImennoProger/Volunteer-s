@@ -14,8 +14,8 @@ class ChatMessage(Base):
     __tablename__ = 'chat_messages'
 
     id = Column(Integer, primary_key=True, index=True)
-    sender_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id'))
-    recipient_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id'))
+    sender_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id', onupdate="CASCADE", ondelete="SET NULL"))
+    recipient_id = Column(Integer, ForeignKey('user_metadata.user_metadata_id', onupdate="CASCADE", ondelete="SET NULL"))
     message = Column(String, nullable=False)
     time = Column(DateTime, default=datetime.utcnow)
     delivered = Column(Boolean, default=False)
