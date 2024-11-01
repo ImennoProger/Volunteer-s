@@ -13,7 +13,7 @@ from fastapi_socketio import SocketManager
 from database import SessionLocal
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from models import ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat, UserMetadataReadProfile
+from models import CategoryBase, ChatMessage, Country, City, CountryCreate, CityCreate, UserMetadataCreate, UserMetadata, User, Event, Category, EventRead, UserMetadataRead, EventCreate, EventRegister, EventRegistration, UserMetadataReadForChat, UserMetadataReadProfile
 import ssl
 from dotenv import load_dotenv
 import os
@@ -782,3 +782,8 @@ def get_undelivered_messages(user_id, db):
 def logout(token: str = Depends(oauth2_scheme)):
     # Аннулирование токена: клиент просто удаляет его с клиентской стороны
     return {"message": "Выход выполнен успешно"}
+
+@app.get("/categories", response_model=list[CategoryBase])
+def get_categories(db: Session = Depends(get_db)):
+    categories = db.query(Category).all()
+    return categories

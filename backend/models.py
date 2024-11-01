@@ -331,3 +331,10 @@ class EventCreate(BaseModel):
         if 'start_date' in values and end_date < values['start_date']:
             raise ValueError('End date must be after start date')
         return end_date
+
+class CategoryBase(BaseModel):
+    category_id: int
+    category_name: str
+
+    class Config:
+        orm_mode = True
