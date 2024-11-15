@@ -55,7 +55,7 @@ function EventMap({ events }) {
     return () => map.setTarget(undefined);
   }, [events]);
 
-  return <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>;
+  return <div ref={mapRef} style={{ height: '400px', width: '900px' }}></div>;
 }
 
 export default EventMap;

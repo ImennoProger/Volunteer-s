@@ -1,13 +1,12 @@
+// src/components/EventCard/EventCard.js
 import React, { useState } from 'react';
-import { Card, CardContent, CardMedia, Typography, Box, Snackbar, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Box, Snackbar, Button, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PlaceIcon from '@mui/icons-material/Place';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 function EventCard({ event }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage] = useState('');
-
   const navigate = useNavigate();
 
   const handleDetails = () => {
@@ -16,10 +15,8 @@ function EventCard({ event }) {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return 'Дата не указана';
-
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return 'Дата не указана';
-
     const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
     return date.toLocaleDateString('ru-RU', options);
   };
@@ -39,19 +36,30 @@ function EventCard({ event }) {
         }}
         onClick={handleDetails}
       >
-        <CardMedia
-          component="img"
-          alt={event.name}
-          image={event.imageUrl}
+      <Box 
           sx={{ 
-            objectFit: 'cover', 
-            aspectRatio: '1 / 1', 
-            transition: 'opacity 0.3s ease-in-out',
-            '&:hover': {
-              opacity: 0.7
-            }
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '100%', // Убедитесь, что обертка занимает всю высоту
+            overflow: 'hidden' 
           }}
-        />
+        >
+          <CardMedia
+            component="img"
+            alt={event.name}
+            image={event.imageUrl || 'default-image.jpg'}
+            sx={{ 
+              objectFit: 'cover', 
+              width: '100%', // Растягивает изображение на всю ширину обертки
+              height: '100%', // Растягивает изображение на всю высоту обертки
+              transition: 'opacity 0.3s ease-in-out',
+              '&:hover': {
+                opacity: 0.7
+              }
+            }}
+          />
+        </Box>
         <Box 
           sx={{ 
             position: 'absolute', 
@@ -89,12 +97,11 @@ function EventCard({ event }) {
           </Box>
         </CardContent>
       </Card>
-
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
+        message="Информация о событии"
         action={
           <Button color="inherit" onClick={() => setSnackbarOpen(false)}>
             Закрыть
