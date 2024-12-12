@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthContext';
 import { useAppTheme } from '../Header/ThemeContext';
@@ -12,6 +12,21 @@ const Header1 = ({ unreadMessagesCount = 0 }) => {
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useAppTheme();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Убираем position absolute при монтировании компонента
+    const headdElement = document.querySelector('.headd');
+    if (headdElement) {
+      headdElement.style.position = ''; // Применяем relative
+    }
+
+    return () => {
+      // При размонтировании можно вернуть обратно
+      if (headdElement) {
+        headdElement.style.position = ''; // Убираем изменения
+      }
+    };
+  }, []);
 
   const handleProfileClick = () => {
     if (isAuthenticated) {
@@ -32,7 +47,7 @@ const Header1 = ({ unreadMessagesCount = 0 }) => {
 
   return (
     <header>
-      <div className="head">
+      <div className="headd">
         <div className="head_logo">
           <img src={logo} alt="Логотип" />
           <h1>Волонтерский портал</h1>

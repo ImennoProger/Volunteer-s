@@ -45,7 +45,7 @@ button{
 
 /* header */
 
-.head{
+.headd{
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -53,7 +53,7 @@ button{
     height: 84px;
     background-color: rgba(0, 0, 0, 0);
     width: 100%;
-    position: absolute;
+    
 }
 
 .head_logo{

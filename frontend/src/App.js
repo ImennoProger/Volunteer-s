@@ -5,8 +5,7 @@ import io from 'socket.io-client';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ResetPassword from './components/Auth/ResetPassword';
-import Navbar from './components/Header/Navbar';
-import Footer from './components/Footer/Footer';
+import Footer1 from './components/Footer1/Footer1';  // Заменили Footer на Footer1
 import Home from './pages/Home';
 import ProtectedPage from './pages/Protected';
 import VolunteerPage from './pages/VolunteerPage';
@@ -19,8 +18,7 @@ import ChatPage from './pages/ChatPage';
 import NewPage from './pages/NewPage';
 import { ThemeProvider } from './components/Header/ThemeContext';
 import Header1 from './components/Header1/Header1';
-import './style/globalStyles.css';
-
+import './style/globalStyles.css';  // CSS файл тоже должен быть вверху
 
 const App = () => {
   const [userRole, setUserRole] = useState(null);
@@ -69,11 +67,11 @@ const App = () => {
           setUserRole(decodedToken.role);
         } catch (error) {
           setUserRole(null);
-          navigate('/login');  
+          navigate('/login');
         }
       } else {
         setUserRole(null);
-        navigate('/login');  
+        navigate('/login');
       }
     };
 
@@ -99,7 +97,7 @@ const App = () => {
     }
   };
 
-  const isCustomPage = location.pathname === '/newpage';
+  const isCustomPage = location.pathname === '/';
 
   return (
     <ThemeProvider>
@@ -112,7 +110,7 @@ const App = () => {
           <Header1 /> {/* Заменяем Navbar на Header1 */}
           <div className="container">
             <Routes>
-              <Route path="/" element={<Home />} />
+              {/* <Route path="/" element={<Home />} /> */}
               <Route path="/login" element={<Login />} />
               <Route path="/protected" element={<ProtectedPage />} />
               <Route path="/register" element={<Register />} />
@@ -123,7 +121,7 @@ const App = () => {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
-          <Footer />
+          <Footer1 /> {/* Заменили Footer на Footer1 */}
         </>
       )}
     </ThemeProvider>

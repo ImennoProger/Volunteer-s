@@ -13,6 +13,13 @@ const NewPage = () => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
+    // Изменяем стиль только на этой странице
+    const headdElement = document.querySelector('.headd');
+    if (headdElement) {
+      headdElement.style.position = 'absolute'; // Устанавливаем абсолютное позиционирование
+    }
+
+    // Получаем события
     const fetchEvents = async () => {
       try {
         const response = await axios.get(`${apiBaseUrl}/events/`);
@@ -36,7 +43,14 @@ const NewPage = () => {
     };
 
     fetchEvents();
-  }, []);
+
+    // При размонтировании страницы, убираем изменения стиля
+    return () => {
+      if (headdElement) {
+        headdElement.style.position = ''; // Сбрасываем стиль
+      }
+    };
+  }, []); // Эффект срабатывает только один раз при монтировании компонента
 
   return (
     <div>
