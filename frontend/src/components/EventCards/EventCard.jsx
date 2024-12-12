@@ -32,7 +32,9 @@ function EventCard({ event }) {
           mb: 3, 
           position: 'relative', 
           overflow: 'hidden',
-          '&:hover': { cursor: 'pointer' }
+          '&:hover': { cursor: 'pointer' },
+          height: '100%',
+          backgroundColor: 'white'
         }}
         onClick={handleDetails}
       >
@@ -41,8 +43,11 @@ function EventCard({ event }) {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            height: '100%', // Убедитесь, что обертка занимает всю высоту
-            overflow: 'hidden' 
+            height: '240px',
+            width: '100%',
+            overflow: 'hidden',
+            padding: 0,
+            margin: 0
           }}
         >
           <CardMedia
@@ -50,9 +55,12 @@ function EventCard({ event }) {
             alt={event.name}
             image={event.imageUrl || 'default-image.jpg'}
             sx={{ 
-              objectFit: 'cover', 
-              width: '100%', // Растягивает изображение на всю ширину обертки
-              height: '100%', // Растягивает изображение на всю высоту обертки
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              padding: 0,
+              margin: 0,
+              transform: 'scale(1.5)',
               transition: 'opacity 0.3s ease-in-out',
               '&:hover': {
                 opacity: 0.7

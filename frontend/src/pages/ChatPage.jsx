@@ -26,7 +26,7 @@ const ChatPage = ({ socket }) => {
     // Проверка токена
     fetch(`${apiBaseUrl}/profile`, {
       headers: {
-        'Authorization': `Bearer ${token}`,  // Используем токен для аутентификации
+        'Authorization': `Bearer ${token}`,
       }
     })
       .then(response => {
@@ -37,41 +37,36 @@ const ChatPage = ({ socket }) => {
       })
       .then(data => {
         console.log('User token verified:', data);
-        console.log('token:', token);
-        setCurrentUser(data); // Предполагается, что ответ содержит информацию о текущем пользователе
-        // Инициализация socket после успешной верификации токена
+        setCurrentUser(data);
 
-        // Обработка входящих сообщений
-        socket.on('chat_message', (msg) => {
-          console.log('Message received:', msg);
-          if (msg.sender_id === currentUser?.user_metadata_id || msg.sender_id === currentChatPartnerId) {
-            setMessages(prevMessages => [...prevMessages, msg]);
-          }
-        });
+        if (socket) {
+          socket.on('chat_message', (msg) => {
+            console.log('Message received:', msg);
+            if (msg.sender_id === currentUser?.user_metadata_id || msg.sender_id === currentChatPartnerId) {
+              setMessages(prevMessages => [...prevMessages, msg]);
+            }
+          });
 
-        // Обработка статуса пользователей
-        socket.on('user_status', (data) => {
-          const { user_id, status } = data;
-          setOnlineUsers(prevStatus => ({
-            ...prevStatus,
-            [user_id]: status === 'online'
-          }));
-          console.log(`User ${user_id} is now ${status}`);
-        });
+          socket.on('user_status', (data) => {
+            const { user_id, status } = data;
+            setOnlineUsers(prevStatus => ({
+              ...prevStatus,
+              [user_id]: status === 'online'
+            }));
+          });
 
-        // Обработка количества непрочитанных сообщений
-        socket.on('unread_messages_count', (data) => {
-          const { user_id, unread_count } = data;
-          console.log(`Unread count update: User ${user_id}, Count ${unread_count}`);
-          setUnreadCounts(prevCounts => ({
-            ...prevCounts,
-            [user_id]: unread_count
-          }));
-        });
+          socket.on('unread_messages_count', (data) => {
+            const { user_id, unread_count } = data;
+            setUnreadCounts(prevCounts => ({
+              ...prevCounts,
+              [user_id]: unread_count
+            }));
+          });
 
-        socket.on('disconnect', () => {
-          console.log('Socket disconnected');
-        });
+          socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+          });
+        }
       })
       .catch(error => {
         console.error('Token verification error:', error);
@@ -79,10 +74,12 @@ const ChatPage = ({ socket }) => {
       });
 
     return () => {
-      socket.off('chat_message');
-      socket.off('user_status');
-      socket.off('unread_messages_count');
-      socket.off('disconnect');
+      if (socket) {
+        socket.off('chat_message');
+        socket.off('user_status');
+        socket.off('unread_messages_count');
+        socket.off('disconnect');
+      }
     };
   }, [currentChatPartnerId]);
 
@@ -150,9 +147,19 @@ const ChatPage = ({ socket }) => {
               onClick={() => setRecipientId(user.user_metadata_id)}
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             >
-              <Typography variant="body1" style={{ flexGrow: 1 }}>
-                {`${user.user_name} ${user.user_surname}`}
-              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: onlineUsers[user.user_metadata_id] ? '#4caf50' : '#bdbdbd'
+                  }}
+                />
+                <Typography variant="body1" style={{ flexGrow: 1 }}>
+                  {`${user.user_name} ${user.user_surname}`}
+                </Typography>
+              </div>
               <Badge badgeContent={unreadCounts[user.user_metadata_id] || 0} color="primary" style={{ marginLeft: 'auto' }} />
             </ListItem>
           ))}
@@ -162,14 +169,21 @@ const ChatPage = ({ socket }) => {
       {/* Если не выбран получатель, показываем предложение выбрать собеседника */}
       {!recipientId ? (
         <div className="chat-section">
-          <Typography variant="h6" align="center">
+          <Typography variant="h6" align="center" sx={{ color: '#fff' }}>
             Пожалуйста, выберите собеседника, чтобы начать чат
           </Typography>
         </div>
       ) : (
         <div className="chat-section">
           <div className="chat-header">
-            <h3>{recipientName}</h3>
+            <Typography variant="h6" style={{ fontWeight: 500 }}>
+              {recipientName}
+            </Typography>
+            {onlineUsers[recipientId] && (
+              <Typography variant="caption" style={{ color: '#4caf50' }}>
+                В сети
+              </Typography>
+            )}
           </div>
           <div className="chat-window">
             {messages.map((msg, index) => (
@@ -195,8 +209,33 @@ const ChatPage = ({ socket }) => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               fullWidth
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: '#fff'
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#fff'
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#fff'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#fff'
+                  }
+                }
+              }}
             />
-            <Button variant="contained" color="primary" onClick={handleSend}>
+            <Button 
+              variant="contained" 
+              onClick={handleSend}
+              sx={{
+                backgroundColor: 'rgb(0,128,128)',
+                '&:hover': {
+                  backgroundColor: 'rgb(0,128,128)'
+                }
+              }}
+            >
               Отправить
             </Button>
           </div>

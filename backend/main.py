@@ -782,3 +782,21 @@ def get_undelivered_messages(user_id, db):
 def logout(token: str = Depends(oauth2_scheme)):
     # Аннулирование токена: клиент просто удаляет его с клиентской стороны
     return {"message": "Выход выполнен успешно"}
+
+@app.get("/event-register/check/{event_id}")
+def check_event_registration(event_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    # Получаем текущего пользователя
+    current_user = get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    
+    # Проверяем существование регистрации
+    registration = db.query(EventRegistration).filter(
+        EventRegistration.user_id == current_user.user_metadata_id,
+        EventRegistration.event_id == event_id
+    ).first()
+    
+    return {
+        "is_registered": registration is not None,
+        "registration_date": registration.registration_date if registration else None
+    }

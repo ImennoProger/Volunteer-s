@@ -1,0 +1,10 @@
+.ewt {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ewt img {
+  width: 24px;
+  height: 24px;
+}

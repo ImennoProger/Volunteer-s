@@ -153,7 +153,10 @@ const ManageEvents = () => {
               p: 2,
               border: '1px solid #ddd',
               borderRadius: '8px',
-              width: '100%' // Убедитесь, что контейнер занимает всю доступную ширину
+              width: '100%',
+              '& .MuiInputBase-input': {
+                color: '#000000'
+              }
             }}
           >
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>

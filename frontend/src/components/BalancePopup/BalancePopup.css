@@ -1,0 +1,63 @@
+.balance-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+  z-index: 1000;
+  min-width: 120px;
+}
+
+.balance-content {
+  text-align: center;
+}
+
+.balance-content h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.balance-amount {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2196f3;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -10px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Темная тема */
+[data-theme='dark'] .balance-popup {
+  background: #333;
+}
+
+[data-theme='dark'] .balance-content h3 {
+  color: #fff;
+}
+
+[data-theme='dark'] .balance-amount {
+  color: #64b5f6;
+} 

@@ -147,8 +147,8 @@ const VolunteerPage = () => {
             [`& .MuiDrawer-paper`]: {
               width: 240,
               boxSizing: 'border-box',
-              border: 'none', // Убираем границу
-              marginTop: '80px', // Отступ, чтобы панель не перекрывала шапку
+              border: 'none',
+              marginTop: '80px',
               backgroundColor: 'rgba(255, 255, 255, 0.00001)',
             },
           }}
@@ -162,41 +162,80 @@ const VolunteerPage = () => {
                 ml: 3,
                 mb: 3,
                 fontWeight: 'bold',
-                color: theme.palette.text.primary,  // Использование цвета текста из темы
+                color: 'rgba(255, 255, 255, 0.9)',
               }}
             >
               Волонтёр
             </Typography>
 
             <StyledListItem button onClick={() => handleSectionChange('profile')}>
-              <StyledListItemIcon>
+              <StyledListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 <AccountCircleIcon />
               </StyledListItemIcon>
-              <ListItemText primary="Настройки профиля" />
+              <ListItemText 
+                primary="Настройки профиля" 
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }
+                }} 
+              />
             </StyledListItem>
+
             <StyledListItem button onClick={() => handleSectionChange('achievements')}>
-              <StyledListItemIcon>
+              <StyledListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 <EmojiEventsIcon />
               </StyledListItemIcon>
-              <ListItemText primary="Достижения" />
+              <ListItemText 
+                primary="Достижения" 
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }
+                }} 
+              />
             </StyledListItem>
+
             <StyledListItem button onClick={() => handleSectionChange('events')}>
-              <StyledListItemIcon>
+              <StyledListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 <EventIcon />
               </StyledListItemIcon>
-              <ListItemText primary="Мероприятия на карте" />
+              <ListItemText 
+                primary="Мои мероприятия" 
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }
+                }} 
+              />
             </StyledListItem>
+
             <StyledListItem button onClick={() => handleSectionChange('friends')}>
-              <StyledListItemIcon>
+              <StyledListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 <PeopleIcon />
               </StyledListItemIcon>
-              <ListItemText primary="Друзья" />
+              <ListItemText 
+                primary="Друзья" 
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }
+                }} 
+              />
             </StyledListItem>
+
             <StyledListItem button onClick={() => handleSectionChange('groups')}>
-              <StyledListItemIcon>
+              <StyledListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 <GroupIcon />
               </StyledListItemIcon>
-              <ListItemText primary="Группы" />
+              <ListItemText 
+                primary="Группы" 
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }
+                }} 
+              />
             </StyledListItem>
           </List>
         </Drawer>
@@ -206,13 +245,21 @@ const VolunteerPage = () => {
       <Box
         sx={{
           flexGrow: 1,
-          ml: isMobile ? 0 : '240px', // Отступ для ПК
+          ml: isMobile ? 0 : '140px',
           p: 2,
-          overflow: 'auto',
+          overflow: 'visible',
           width: '100%',
         }}
       >
-        <Paper elevation={3} sx={{ p: 2 }}>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 2,
+            mr: '200px',
+            overflow: 'visible',
+            position: 'relative'
+          }}
+        >
           {renderContent()}
         </Paper>
       </Box>

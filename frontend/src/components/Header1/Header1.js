@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthContext';
 import { useAppTheme } from '../Header/ThemeContext';
@@ -7,11 +7,13 @@ import logo from '../../assets/images/logo.svg';
 import emailIcon from '../../assets/images/email.svg';
 import walletIcon from '../../assets/images/wallet.svg';
 import sunIcon from '../../assets/images/sun.svg';
+import BalancePopup from '../BalancePopup/BalancePopup';
 
 const Header1 = ({ unreadMessagesCount = 0 }) => {
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useAppTheme();
   const navigate = useNavigate();
+  const [showBalance, setShowBalance] = useState(false);
 
   useEffect(() => {
     // Убираем position absolute при монтировании компонента
@@ -45,10 +47,14 @@ const Header1 = ({ unreadMessagesCount = 0 }) => {
     navigate('/chatpage');
   };
 
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
   return (
     <header>
       <div className="headd">
-        <div className="head_logo">
+        <div className="head_logo" onClick={handleHomeClick} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Логотип" />
           <h1>Волонтерский портал</h1>
         </div>
@@ -58,21 +64,31 @@ const Header1 = ({ unreadMessagesCount = 0 }) => {
               className="email"
               src={emailIcon}
               alt="Email Icon"
-              onClick={handleChatClick} // Привязка к переходу в чат
+              onClick={handleChatClick}
               style={{ cursor: 'pointer' }}
             />
-            <img
-              className="wallet"
-              src={walletIcon}
-              alt="Wallet Icon"
-              onClick={() => alert('Баланс: 1500')} // Пример отображения баланса
-              style={{ cursor: 'pointer' }}
-            />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                className="wallet"
+                src={walletIcon}
+                alt="Wallet Icon"
+                onClick={() => setShowBalance(!showBalance)}
+                style={{ 
+                  cursor: 'pointer',
+                  transform: 'translateY(3px)'
+                }}
+              />
+              <BalancePopup 
+                balance="1,500"
+                isVisible={showBalance}
+                onClose={() => setShowBalance(false)}
+              />
+            </div>
             <img
               className="sun"
               src={sunIcon}
               alt="Sun Icon"
-              onClick={toggleTheme} // Переключение темы
+              onClick={toggleTheme}
               style={{ cursor: 'pointer' }}
             />
           </div>

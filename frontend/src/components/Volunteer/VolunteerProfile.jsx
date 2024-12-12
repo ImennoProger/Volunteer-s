@@ -100,15 +100,24 @@ const VolunteerProfile = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', p: 2 }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: isMobile ? 'column' : 'row', 
+      p: 2,
+      maxWidth: '1200px',
+      margin: '0 auto',
+      width: '100%',
+      ml: isMobile ? 'auto' : '0px',
+      mr: isMobile ? 'auto' : '200px'
+    }}>
       {/* Боковая панель */}
       <Box
         sx={{
           width: isMobile ? '100%' : '25%',
           p: 2,
-          backgroundColor: 'var(--secondary-bg-color)',  // Переменная для фона
+          backgroundColor: 'var(--secondary-bg-color)',
           textAlign: 'center',
-          color: 'var(--primary-text-color)',  // Цвет текста
+          color: 'var(--primary-text-color)',
           mb: isMobile ? 2 : 0,
         }}
       >
@@ -153,7 +162,12 @@ const VolunteerProfile = () => {
       </Box>
 
       {/* Основная секция */}
-      <Box sx={{ width: isMobile ? '100%' : '75%', p: 2 }}>
+      <Box sx={{ 
+        width: isMobile ? '100%' : '75%', 
+        p: 2,
+        pl: isMobile ? 2 : 4,
+        pr: isMobile ? 2 : 6
+      }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -161,7 +175,7 @@ const VolunteerProfile = () => {
           variant={isMobile ? 'scrollable' : 'standard'}
         >
           <Tab label="Профиль" onMouseDown={preventDefaultFocus} />
-          <Tab label="Достижения" onMouseDown={preventDefaultFocus} />
+          <Tab label="Баллы" onMouseDown={preventDefaultFocus} />
         </Tabs>
 
         {activeTab === 0 && (
@@ -272,8 +286,88 @@ const VolunteerProfile = () => {
 
         {activeTab === 1 && (
           <Box>
-            <Typography variant="h6">Достижения</Typography>
-            <Typography variant="body2">Здесь будет отображаться список достижений пользователя.</Typography>
+            <Typography variant="h6" sx={{ mb: 3 }}>История баллов</Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 2 
+            }}>
+              {[
+                {
+                  date: '15.11.2023',
+                  event: 'Помощь в организации городского субботника',
+                  points: 150,
+                  status: 'получено'
+                },
+                {
+                  date: '02.11.2023',
+                  event: 'Участие в благотворительном марафоне',
+                  points: 200,
+                  status: 'получено'
+                },
+                {
+                  date: '25.10.2023',
+                  event: 'Помощь в приюте для животных',
+                  points: 100,
+                  status: 'получено'
+                },
+                {
+                  date: '15.10.2023',
+                  event: 'Сбор макулатуры',
+                  points: 50,
+                  status: 'получено'
+                }
+              ].map((item, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    backgroundColor: 'var(--secondary-bg-color)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 1
+                  }}
+                >
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: 'var(--primary-text-color)' }}>
+                      {item.event}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'var(--secondary-text-color)' }}>
+                      {item.date}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1 
+                  }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: 'var(--accent-color)',
+                        fontWeight: 'bold' 
+                      }}
+                    >
+                      +{item.points}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: 'var(--success-color)',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        padding: '4px 8px',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      {item.status}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
           </Box>
         )}
       </Box>

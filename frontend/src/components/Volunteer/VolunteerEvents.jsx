@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Container } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import EventFilters from '../Filters/EventFilters';
 import EventMap from '../Map/EventMap';
 import EventCard from '../EventCards/EventCard';
@@ -12,7 +12,6 @@ const VolunteerEvents = () => {
   const [filteredEvents, setFilteredEvents] = useState([]);
 
   useEffect(() => {
-
     const fetchEvents = async () => {
       try {
         const response = await axios.get(`${apiBaseUrl}/my-events/`, {
@@ -38,11 +37,8 @@ const VolunteerEvents = () => {
           latitude: event.latitude,
           longitude: event.longitude,
         }));
-        if (response.data.message === "Вы уже записаны на это мероприятие") {
-        } else {
-        }
         setVolunteerEvents(eventData || []);
-        setFilteredEvents(eventData)
+        setFilteredEvents(eventData);
       } catch (error) {
         console.error('Ошибка при загрузке мероприятий:', error.response?.data || error.message);
       }
@@ -50,44 +46,52 @@ const VolunteerEvents = () => {
     fetchEvents();
   }, []);
 
-  const handleFilterChange = (filters) => {
-    console.log('Filter change:', filters);
-
-    const filtered = volunteerEvents.filter((event) => {
-      const matchCountry = filters.country ? event.country_name === filters.country_name : true;
-      const matchCity = filters.city ? event.city === filters.city : true;
-      const matchRegion = filters.region ? event.region === filters.region : true;
-      const matchCategory = filters.category ? event.category === filters.category : true;
-      const matchFromDate = filters.fromDate ? new Date(event.startDate) >= new Date(filters.fromDate) : true;
-      const matchToDate = filters.toDate ? new Date(event.endDate) <= new Date(filters.toDate) : true;
-      
-      return (
-        matchCountry && matchCity && matchRegion &&
-        matchCategory && matchFromDate && matchToDate
-      );
-    });
-
-    setFilteredEvents(filtered);
+  const handleFilterChange = (newFilteredEvents) => {
+    setFilteredEvents(newFilteredEvents);
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 2 }}>
-        <EventFilters onFilterChange={handleFilterChange} />
-      </Box>
-      <Box sx={{ mt: 2 }}>
-        <EventMap events={filteredEvents} />
-      </Box>
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {filteredEvents.map((event) => {
-          return (
+    <Box sx={{ 
+      display: 'flex', 
+      gap: 4,
+      position: 'relative',
+      ml: '0px',
+      mr: '0px'
+    }}>
+      <Box sx={{ 
+        flexGrow: 1,
+        pr: 0,
+        pl: 0,
+        width: 'calc(100% - 390px)'
+      }}>
+        <Box sx={{ mb: 2 }}>
+          <EventMap events={filteredEvents} />
+        </Box>
+        <Grid container spacing={2}>
+          {filteredEvents.map((event) => (
             <Grid item xs={12} sm={6} md={4} key={event.id}>
               <EventCard event={event} />
             </Grid>
-          );
-        })}
-      </Grid>
-    </Container>
+          ))}
+        </Grid>
+      </Box>
+
+      <Box sx={{ 
+        width: '250px', 
+        flexShrink: 0,
+        p: 2,
+        borderRadius: 1,
+        height: 'fit-content',
+        position: 'fixed',
+        right: '100px',
+        top: '44px'
+      }}>
+        <EventFilters 
+          onFilterChange={handleFilterChange} 
+          events={volunteerEvents}
+        />
+      </Box>
+    </Box>
   );
 };
 

@@ -11,6 +11,7 @@ const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const NewPage = () => {
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
 
   useEffect(() => {
     // Изменяем стиль только на этой странице
@@ -28,15 +29,23 @@ const NewPage = () => {
           name: event.event_name,
           description: event.full_description,
           shortDescription: event.short_description,
-          latitude: event.latitude,
-          longitude: event.longitude,
-          imageUrl: event.image,
-          city: event.city_name || 'Не указано',
+          requiredPeople: event.required_volunteers,
+          registeredPeople: event.registered_volunteers,
+          points: event.participation_points,
+          awards: event.rewards,
           startDate: event.start_date,
           endDate: event.end_date,
+          country: event.country_name,  
+          city: event.city_name  || 'Не указано',        
+          category: event.category_name,
+          imageUrl: event.image, 
+          latitude: event.latitude,
+          longitude: event.longitude,
+          
         }));
         console.log('Events received:', eventData); // Логируем события
         setEvents(eventData);
+        setFilteredEvents(eventData);
       } catch (error) {
         console.error('Ошибка при получении событий:', error);
       }
@@ -52,12 +61,16 @@ const NewPage = () => {
     };
   }, []); // Эффект срабатывает только один раз при монтировании компонента
 
+  const handleFilterChange = (newFilteredEvents) => {
+    setFilteredEvents(newFilteredEvents);
+  };
+
   return (
     <div>
       <Header1 />
       <Mission1 />
-      <EventMap1 events={events} />
-      <EventList1 events={events} />
+      <EventMap1 events={events} onFilterChange={handleFilterChange} />
+      <EventList1 events={filteredEvents} />
       <AboutUs1 />
       <Footer1 />
     </div>

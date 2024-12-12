@@ -20,15 +20,28 @@ function EventDetails() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const navigate = useNavigate();
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/events/${id}/`);
-        setEvent(response.data);
+        const token = localStorage.getItem('token');
+        const [eventResponse, registrationResponse] = await Promise.all([
+          // Получаем детали события
+          axios.get(`${apiBaseUrl}/events/${id}/`),
+          // Проверяем статус регистрации
+          axios.get(`${apiBaseUrl}/event-register/check/${id}/`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+        ]);
+
+        setEvent(eventResponse.data);
+        setIsRegistered(registrationResponse.data.is_registered);
         setLoading(false);
       } catch (error) {
-        console.error('Ошибка при загрузке данных события:', error);
+        console.error('Ошибка при загрузке данных:', error);
         setLoading(false);
       }
     };
@@ -75,18 +88,24 @@ function EventDetails() {
           Authorization: `Bearer ${token}`
         }
       });
-      if (response.data.message === "Вы уже записаны на это мероприятие") {
-        setSnackbarMessage('Вы уже записаны на это мероприятие');
-      } else {
-          setSnackbarMessage('Вы записаны на мероприятие');
-      }
+      
+      // Обновляем статус регистрации после успешной записи
+      const registrationStatus = await axios.get(`${apiBaseUrl}/event-register/check/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      setIsRegistered(registrationStatus.data.is_registered);
+      setSnackbarMessage('Вы успешно записались на мероприятие');
       setSnackbarOpen(true);
-      setLoading(false);
     } catch (error) {
       console.error('Ошибка при записи на мероприятие:', error);
+      setSnackbarMessage('Ошибка при записи на мероприятие');
+      setSnackbarOpen(true);
+    } finally {
       setLoading(false);
     }
-
   };
 
   const handleCloseSnackbar = () => {
@@ -189,8 +208,13 @@ function EventDetails() {
               <strong>Зарегистрировано:</strong> {event.registered_volunteers} человек
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Button variant="contained" color="primary" onClick={handleRegister}>
-                Записаться
+              <Button 
+                variant={isRegistered ? "outlined" : "contained"}
+                color={isRegistered ? "success" : "primary"}
+                onClick={handleRegister}
+                disabled={isRegistered}
+              >
+                {isRegistered ? 'Вы записаны' : 'Записаться'}
               </Button>
               <Button variant="outlined" color="primary" onClick={handleBack}>
                 Назад

@@ -55,7 +55,33 @@ function EventMap({ events }) {
     return () => map.setTarget(undefined);
   }, [events]);
 
-  return <div ref={mapRef} style={{ height: '400px', width: '900px' }}></div>;
+  return <div>
+    <div className="map-container" ref={mapRef} style={{ 
+      height: '483px', 
+      width: '1000px',
+      borderRadius: '12px',
+      border: '1px solid #e0e0e0',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      overflow: 'hidden',
+      transition: 'all 0.3s ease',
+      position: 'relative',
+    }}>
+      <div className="map-overlay" style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(255, 255, 255, 0.9)',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+        fontSize: '14px',
+        color: '#666',
+        zIndex: 1000,
+      }}>
+        Всего мероприятий: {events.length}
+      </div>
+    </div>
+  </div>;
 }
 
 export default EventMap;
