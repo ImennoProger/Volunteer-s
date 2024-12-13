@@ -1,8 +1,8 @@
 import React from 'react';
-import '../../style/style.css';
+import './Footer1.css';
 
 const Footer1 = () => (
-  <footer>
+  <footer className="footer">
     <h2>Волонтерский портал</h2>
     <div className="footer_info">
       <div className="gr1">

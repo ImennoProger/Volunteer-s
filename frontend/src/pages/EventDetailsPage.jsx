@@ -25,16 +25,15 @@ function EventDetails() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const token = localStorage.getItem('token');
         const [eventResponse, registrationResponse] = await Promise.all([
           // Получаем детали события
           axios.get(`${apiBaseUrl}/events/${id}/`),
-          // Проверяем статус регистрации
-          axios.get(`${apiBaseUrl}/event-register/check/${id}/`, {
+          // Проверяем статус регистрации, если пользователь авторизован
+          localStorage.getItem('token') ? axios.get(`${apiBaseUrl}/event-register/check/${id}/`, {
             headers: {
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${localStorage.getItem('token')}`
             }
-          })
+          }) : Promise.resolve({ data: { is_registered: false } })
         ]);
 
         setEvent(eventResponse.data);
@@ -187,107 +186,83 @@ function EventDetails() {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: '1200px', margin: 'auto' }}>
-      <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-        {/* Левый блок с картинкой и информацией */}
-        <Box sx={{ flex: 1, border: '2px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-          <Card>
-            <CardMedia
-              component="img"
-              alt={event.event_name}
-              height="300"
-              image={event.image || 'https://via.placeholder.com/500'}
-              sx={{ objectFit: 'cover' }}
-            />
-          </Card>
-          <Box sx={{ p: 2, textAlign: 'center', backgroundColor: '#f9f9f9', borderTop: '1px solid #ddd' }}>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Требуется:</strong> {event.required_volunteers} человек
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              <strong>Зарегистрировано:</strong> {event.registered_volunteers} человек
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Button 
-                variant={isRegistered ? "outlined" : "contained"}
-                color={isRegistered ? "success" : "primary"}
-                onClick={handleRegister}
-                disabled={isRegistered}
-              >
-                {isRegistered ? 'Вы записаны' : 'Записаться'}
-              </Button>
-              <Button variant="outlined" color="primary" onClick={handleBack}>
-                Назад
-              </Button>
-            </Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', maxWidth: '1300px', margin: 'auto' }}>
+      {/* Левый блок с картинкой и информацией */}
+      <Box sx={{ flex: 1, borderRadius: '8px', overflow: 'hidden', marginRight: 2, display: 'flex', flexDirection: 'column', height: 'auto' }}>
+        <Card>
+          <CardMedia
+            component="img"
+            alt={event.event_name}
+            height="300"
+            image={event.image || 'https://via.placeholder.com/500'}
+            sx={{ objectFit: 'cover' }}
+          />
+        </Card>
+        <Box sx={{ p: 2, textAlign: 'center', backgroundColor: '#f9f9f9', borderTop: '1px solid #ddd' }}>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            <strong>Требуется:</strong> {event.required_volunteers} человек
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            <strong>Зарегистрировано:</strong> {event.registered_volunteers} человек
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Button 
+              variant={isRegistered ? "outlined" : "contained"}
+              color={isRegistered ? "success" : "primary"}
+              onClick={handleRegister}
+              disabled={isRegistered}
+            >
+              {isRegistered ? 'Вы записаны' : 'Записаться'}
+            </Button>
+            <Button variant="outlined" color="primary" onClick={handleBack}>
+              Назад
+            </Button>
           </Box>
         </Box>
+      </Box>
 
-        {/* Правый блок с основной информацией */}
-        <Box sx={{ flex: 2 }}>
-          <Typography variant="h4" sx={{ mb: 2 }}>{event.event_name}</Typography>
+      {/* Правый блок с основной информацией */}
+      <Box sx={{ flex: 2 }}>
+        <Typography variant="h4" sx={{ mb: 2, color: '#fff' }}>{event.event_name}</Typography>
 
-          <Box sx={{ mb: 3, p: 2, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>Основная информация</Typography>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Краткое описание:</strong> {event.short_description}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <PlaceIcon sx={{ mr: 1, color: '#1976d2' }} />
-              <Typography variant="body1">{event.country_name}, {event.city_name}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <CalendarTodayIcon sx={{ mr: 1, color: '#1976d2' }} />
-              <Typography variant="body1">
-                {new Date(event.start_date).toLocaleDateString()} - {new Date(event.end_date).toLocaleDateString()}
-              </Typography>
-            </Box>
+        <Box sx={{ mb: 3, p: 2, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>Основная информация</Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            <strong>Краткое описание:</strong> {event.short_description}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <PlaceIcon sx={{ mr: 1, color: '#1976d2' }} />
+            <Typography variant="body1">{event.country_name}, {event.city_name}</Typography>
           </Box>
-          <Box sx={{ mb: 2 }}>
-            <EventMap events={[{
-              id: event.event_id,
-              name: event.event_name,
-              description: event.full_description,
-              latitude: event.latitude,
-              longitude: event.longitude,
-            }]} />
-          </Box>
-          <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>Описание</Typography>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Полное описание:</strong> {event.full_description}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Очки:</strong> {event.participation_points}
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CalendarTodayIcon sx={{ mr: 1, color: '#1976d2' }} />
             <Typography variant="body1">
-              <strong>Награды:</strong> {event.rewards}
+              {new Date(event.start_date).toLocaleDateString()} - {new Date(event.end_date).toLocaleDateString()}
             </Typography>
           </Box>
         </Box>
+        <Box sx={{ mb: 2 }}>
+          <EventMap events={[{
+            id: event.event_id,
+            name: event.event_name,
+            description: event.full_description,
+            latitude: event.latitude,
+            longitude: event.longitude,
+          }]} />
+        </Box>
+        <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9', mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>Описание</Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            <strong>Полное описание:</strong> {event.full_description}
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            <strong>Очки:</strong> {event.participation_points}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Награды:</strong> {event.rewards}
+          </Typography>
+        </Box>
       </Box>
-
-      {/* Блок с рекомендованными мероприятиями */}
-      <Box sx={{ mt: 5 }}>
-        <Typography variant="h5" sx={{ mb: 3 }}>Также рекомендуем</Typography>
-        <Slider {...settings}>
-          {recommendedEvents.map(event => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </Slider>
-      </Box>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-        action={
-          <Button color="inherit" onClick={handleCloseSnackbar}>
-            Закрыть
-          </Button>
-        }
-      />
     </Box>
   );
 }

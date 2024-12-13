@@ -8,35 +8,85 @@
 
 .card-container {
   width: 100%;
-  max-width: 400px;
-  padding: 20px;
+  max-width: 300px;
+  padding: 40px;
+  min-height: 600px; /* Установите минимальную высоту */
 }
 
 .card {
   background-color: #fefcff;
-  padding: 20px;
+  padding: 0; /* Установите padding в 0 */
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
+  min-height: 400px;
 }
 
 .card-title {
   font-size: 2rem;
+  margin-bottom: 40px; /* Увеличьте отступ снизу для заголовка */
+}
+
+.login-input-field {
+  position: relative;
   margin-bottom: 20px;
 }
 
-.input-field {
-  margin-bottom: 20px;
+.floating-label {
+  position: relative;
+}
+
+.floating-label input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+.floating-label label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  transition: all 0.2s ease;
+  color: #aaa;
+  pointer-events: none;
+}
+
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label {
+  top: 0;
+  left: 10px;
+  font-size: 0.75rem;
+  color: #4a90e2;
+  transform: translateY(-100%);
 }
 
 .btn-login {
   width: 100%;
   margin-top: 20px;
-  background-color: #b4aae3;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 8px 0; /* Уменьшите верхний и нижний padding */
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-align: center;
+  line-height: 1.2; /* Уменьшите line-height для более плотного выравнивания */
 }
 
 .btn-login:hover {
-  background-color: #82d9e9;
+  background-color: #357ab8;
+  transform: translateY(-2px);
+}
+
+.btn-login:active {
+  background-color: #2c5a8a;
+  transform: translateY(0);
 }
 
 /* Адаптивные стили для экранов до 600px */
@@ -45,11 +95,15 @@
     font-size: 1.5rem;
   }
 
-  .input-field {
+  .login-input-field {
     margin-bottom: 15px;
   }
 
   .btn-login {
     margin-top: 15px;
   }
+}
+
+.card-content {
+  margin-top: 40px; /* Добавьте отступ сверху для блока с полями ввода */
 }
