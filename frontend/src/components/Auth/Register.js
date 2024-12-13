@@ -97,7 +97,7 @@ function Register() {
         <div className="card">
           <h2 className="card-title">Регистрация</h2>
           <form onSubmit={handleSubmit}>
-            <div className="input-field">
+            <div className="input-field-register">
               <input
                 id="email"
                 type="email"
@@ -107,7 +107,7 @@ function Register() {
               />
               <label htmlFor="email">Электронная почта</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <input
                 id="hashed_password"
                 type="password"
@@ -117,7 +117,7 @@ function Register() {
               />
               <label htmlFor="hashed_password">Пароль</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <input
                 id="user_surname"
                 type="text"
@@ -127,7 +127,7 @@ function Register() {
               />
               <label htmlFor="user_surname">Фамилия</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <input
                 id="user_name"
                 type="text"
@@ -137,7 +137,7 @@ function Register() {
               />
               <label htmlFor="user_name">Имя</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <input
                 id="user_patronymic"
                 type="text"
@@ -147,7 +147,7 @@ function Register() {
               />
               <label htmlFor="user_patronymic">Отчество</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register  ">
               <input
                 id="age"
                 type="number"
@@ -158,7 +158,7 @@ function Register() {
               />
               <label htmlFor="age">Возраст</label>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <select
                 id="country"
                 value={country}
@@ -172,7 +172,7 @@ function Register() {
                 ))}
               </select>
             </div>
-            <div className="input-field">
+            <div className="input-field-register">
               <select
                 id="city"
                 value={city}
@@ -188,7 +188,7 @@ function Register() {
               </select>
             </div>
             <button
-              className="btn waves-effect waves-light btn-register"
+              className="btn waves-effect waves-light btn-login"
               type="submit"
               disabled={loading}
             >

@@ -95,6 +95,7 @@ function Login() {
                 <button className="btn waves-effect waves-light btn-login" type="submit" disabled={loading}>
                   {loading ? 'Вход...' : 'Войти'}
                 </button>
+                <Link to="/register" className="forgot-password">Нет аккаунта? Зарегистрироваться</Link>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
               </div>
             </div>
