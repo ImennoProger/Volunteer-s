@@ -10,6 +10,7 @@ import {
   CardMedia,
   CardActions,
   Paper,
+  Snackbar,
 } from '@mui/material';
 import axios from 'axios';
 import EventMapCreate from '../Map/EventMapCreate.jsx';
@@ -34,7 +35,9 @@ const ManageEvents = () => {
     longitude: ''
   });
   const [imagePreview, setImagePreview] = useState(''); // Для хранения URL предварительного просмотра изображения
-
+  const [errors, setErrors] = useState({});
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -67,8 +70,48 @@ const ManageEvents = () => {
     }
   };
 
+  const validateFields = () => {
+    const newErrors = {};
+    if (!newEvent.name || newEvent.name.length < 2) {
+      newErrors.name = 'Название должно содержать не менее 2 символов';
+    }
+    if (!newEvent.shortDescription || newEvent.shortDescription.length < 10) {
+      newErrors.shortDescription = 'Краткое описание должно быть не менее 10 символов';
+    }
+    if (!newEvent.fullDescription || newEvent.fullDescription.length < 20) {
+      newErrors.fullDescription = 'Полное описание должно быть не менее 20 символов';
+    }
+    if (!newEvent.requiredPeople || newEvent.requiredPeople <= 0) {
+      newErrors.requiredPeople = 'Укажите количество участников больше нуля';
+    }
+    if (!newEvent.points || newEvent.points <= 0) {
+      newErrors.points = 'Баллы должны быть больше нуля';
+    }
+    if (!newEvent.awards) {
+      newErrors.awards = 'Укажите награды';
+    }
+    if (!newEvent.category) {
+      newErrors.category = 'Категория обязательна';
+    }
+    if (!newEvent.startDate) {
+      newErrors.startDate = 'Дата начала обязательна';
+    }
+    if (!newEvent.endDate || newEvent.endDate < newEvent.startDate) {
+      newErrors.endDate = 'Дата окончания должна быть позже даты начала';
+    }
+    return newErrors;
+  };
+
   const handleCreateEvent = async (e) => {
     e.preventDefault();
+
+    const fieldErrors = validateFields();
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      setErrorMessage('Исправьте ошибки перед отправкой');
+      setOpenSnackbar(true);
+      return;
+    }
 
     try {
       const token = localStorage.getItem('token');
@@ -168,6 +211,8 @@ const ManageEvents = () => {
               name="name"
               value={newEvent.name}
               onChange={handleChange}
+              error={Boolean(errors.name)}
+              helperText={errors.name}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -176,6 +221,8 @@ const ManageEvents = () => {
               name="shortDescription"
               value={newEvent.shortDescription}
               onChange={handleChange}
+              error={Boolean(errors.shortDescription)}
+              helperText={errors.shortDescription}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -184,6 +231,8 @@ const ManageEvents = () => {
               name="fullDescription"
               value={newEvent.fullDescription}
               onChange={handleChange}
+              error={Boolean(errors.fullDescription)}
+              helperText={errors.fullDescription}
               sx={{ mb: 2 }}
               multiline
               rows={4}
@@ -195,6 +244,8 @@ const ManageEvents = () => {
               type="number"
               value={newEvent.requiredPeople}
               onChange={handleChange}
+              error={Boolean(errors.requiredPeople)}
+              helperText={errors.requiredPeople}
               inputProps={{ min: 0 }}
               sx={{ mb: 2 }}
             />
@@ -205,6 +256,8 @@ const ManageEvents = () => {
               type="number"
               value={newEvent.points}
               onChange={handleChange}
+              error={Boolean(errors.points)}
+              helperText={errors.points}
               inputProps={{ min: 0 }}
               sx={{ mb: 2 }}
             />
@@ -214,6 +267,8 @@ const ManageEvents = () => {
               name="awards"
               value={newEvent.awards}
               onChange={handleChange}
+              error={Boolean(errors.awards)}
+              helperText={errors.awards}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -224,6 +279,8 @@ const ManageEvents = () => {
               value={newEvent.startDate}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
+              error={Boolean(errors.startDate)}
+              helperText={errors.startDate}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -234,6 +291,8 @@ const ManageEvents = () => {
               value={newEvent.endDate}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
+              error={Boolean(errors.endDate)}
+              helperText={errors.endDate}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -242,6 +301,8 @@ const ManageEvents = () => {
               name="category"
               value={newEvent.category}
               onChange={handleChange}
+              error={Boolean(errors.category)}
+              helperText={errors.category}
               sx={{ mb: 2 }}
             />
             <Box sx={{ mb: 2 }}>
@@ -326,6 +387,12 @@ const ManageEvents = () => {
           </Grid>
         </Grid>
       </Grid>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        message={errorMessage}
+      />
     </Paper>
   );
 };
