@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.19430640.css",
+    "main.js": "/static/js/main.4c5012bc.js",
+    "static/media/your-avatar-image.gif": "/static/media/your-avatar-image.6d98b9a9d0c29cb2bfe6.gif",
+    "static/media/logo.svg": "/static/media/logo.2b6c0e3a14df8742ed5415fd79757073.svg",
+    "static/media/main_obj.jpg": "/static/media/main_obj.1de0df0ffaf0c64dcf38.jpg",
+    "static/media/niger_lol.jpg": "/static/media/niger_lol.f8572f61d96d8e23386d.jpg",
+    "static/media/vk-logo.png": "/static/media/vk-logo.8b70c58529960b43c437.png",
+    "static/media/marker.png": "/static/media/marker.4e79c111d1d9016e7c29.png",
+    "static/media/elem_0.jpg": "/static/media/elem_0.aa136ae1434243dddabf.jpg",
+    "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
+    "static/media/slick.eot": "/static/media/slick.a4e97f5a2a64f0ab1323.eot",
+    "static/media/slick.ttf": "/static/media/slick.c94f7671dcc99dce43e2.ttf",
+    "static/media/sun.svg": "/static/media/sun.e2c78d405873aba26e20633c381c6643.svg",
+    "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
+    "static/media/email.svg": "/static/media/email.0e15321bbfd153a56cbe0d5d736dac5d.svg",
+    "index.html": "/index.html",
+    "static/media/wallet.svg": "/static/media/wallet.2c10050f729bc52e76b1dda7ad981696.svg",
+    "main.19430640.css.map": "/static/css/main.19430640.css.map",
+    "main.4c5012bc.js.map": "/static/js/main.4c5012bc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.19430640.css",
+    "static/js/main.4c5012bc.js"
+  ]
+}
